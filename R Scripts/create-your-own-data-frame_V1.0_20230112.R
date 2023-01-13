@@ -1,0 +1,10 @@
+library(tidyverse)
+names <- c("Angelo", "Bartholomew", "Friedrich", "Roberta")
+age <- c(21, 27, 39, 58)
+people <- data.frame(names, age)
+head(people)
+str(people)
+glimpse(people)
+?glimpse
+colnames(people)
+mutate(people, age_in_20 = age + 20)
