@@ -34,11 +34,17 @@ penguins %>%
   summarize(max_bl = max(bill_length_mm), 
             mean_bl= mean(bill_length_mm))
 
-# What if we only want data on Adelie penguins?
+# Use mutate to add a column for kg:
+penguins %>% 
+  mutate(body_mass_kg=body_mass_g/1000,
+         flipper_length_m=flipper_length_mm/1000)
 
 # Create plot
-# ggplot(data=penguins, aes(x=flipper_length_mm, y=body_mass_g))+geom_point(aes(color=species))
-# citation("palmerpenguins")
-# library(tidyverse)
-# library(lubridate)
-# ?print
+ggplot(
+  data=penguins, 
+  aes(
+    x=flipper_length_mm, 
+    y=body_mass_g)
+  )+geom_point(aes(color=species))
+
+citation("palmerpenguins")
