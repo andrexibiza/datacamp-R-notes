@@ -44,22 +44,12 @@ CREATE TABLE IF NOT EXISTS employees(
     CityID INT REFERENCES Cities (CityID) ON DELETE RESTRICT,
     HireDate DATE);
 CREATE TABLE IF NOT EXISTS products(
-	ProductID INT PRIMARY KEY,
-	ProductName VARCHAR(45),
-    Price NUMERIC,
-    CategoryID INT REFERENCES categories (category_id) ON DELETE RESTRICT,
+    ProductID INT PRIMARY KEY,
+    ProductName VARCHAR(45),
+    Price DECIMAL,
+    CategoryID INT REFERENCES categories (CategoryID) ON DELETE RESTRICT,  -- Fixed case
     Class VARCHAR(45),
     ModifyDate DATE,
     Resistant VARCHAR(45),
-    IsAllergic CHAR(5) CHECK (IsAllergic IN ('True','False')),
+    IsAllergic VARCHAR(10) CHECK (IsAllergic IN ('True','False','Unknown')),  -- More flexible
     VitalityDays NUMERIC(3));
-CREATE TABLE IF NOT EXISTS sales(
-	SalesID INT PRIMARY KEY,
-    SalesPersonID INT REFERENCES employees (EmployeeID) ON DELETE RESTRICT,
-    CustomerID INT REFERENCES customers (CustomerID) ON DELETE RESTRICT,
-    ProductID INT REFERENCES products (ProductID) ON DELETE RESTRICT,
-    Quantity INT,
-    Discount NUMERIC,
-    TotalPrice NUMERIC,
-    SalesDate DATE,
-    TransactionNumber VARCHAR(90));
