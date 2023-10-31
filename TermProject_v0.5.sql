@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS sales (
     TotalPrice NUMERIC,
     SalesDate DATE,
     TransactionNumber VARCHAR(255));
-    
 CREATE TABLE IF NOT EXISTS categories (
 	CategoryID INT PRIMARY KEY,
     CategoryName VARCHAR(45));
@@ -25,11 +24,25 @@ CREATE TABLE IF NOT EXISTS cities(
     Zipcode NUMERIC(5),
     CountryID INTEGER REFERENCES countries (CountryID) ON DELETE RESTRICT);
 CREATE TABLE IF NOT EXISTS countries(
-)
+	CountryID INT PRIMARY KEY,
+    CountryName VARCHAR(45),
+    CountryCode VARCHAR(2));
 CREATE TABLE IF NOT EXISTS customers(
-)
+	CustomerID INT PRIMARY KEY,
+    FirstName VARCHAR(45),
+    MiddleInitial VARCHAR(1),
+    LastName VARCHAR(45),
+    CityID INT REFERENCES cities (CityID),
+    Address VARCHAR(90));
 CREATE TABLE IF NOT EXISTS employees(
-)
+	EmployeeID INT PRIMARY KEY,
+    FirstName VARCHAR(45),
+    MiddleInitial VARCHAR(1),
+    LastName VARCHAR(45),
+    BirthDate DATE,
+    Gender VARCHAR(1),
+    CityID INT REFERENCES Cities (CityID),
+    HireDate DATE);
 CREATE TABLE IF NOT EXISTS products(
 )
 CREATE TABLE IF NOT EXISTS sales(
