@@ -14,12 +14,16 @@ CREATE TABLE IF NOT EXISTS sales (
     Discount NUMERIC,
     TotalPrice NUMERIC,
     SalesDate DATE,
-    TransactionNumber VARCHAR(255))
+    TransactionNumber VARCHAR(255));
     
 CREATE TABLE IF NOT EXISTS categories (
-)
+	CategoryID INT PRIMARY KEY,
+    CategoryName VARCHAR(45));
 CREATE TABLE IF NOT EXISTS cities(
-)
+	CityID INT PRIMARY KEY,
+    CityName VARCHAR(45),
+    Zipcode NUMERIC(5),
+    CountryID INTEGER REFERENCES countries (CountryID) ON DELETE RESTRICT);
 CREATE TABLE IF NOT EXISTS countries(
 )
 CREATE TABLE IF NOT EXISTS customers(
