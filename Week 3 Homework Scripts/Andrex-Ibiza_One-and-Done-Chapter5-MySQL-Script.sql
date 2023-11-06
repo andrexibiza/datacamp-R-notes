@@ -55,7 +55,7 @@ CREATE TABLE Salesperson_T (
 	SalespersonState    			CHAR(2),
 	SalespersonZip					VARCHAR(20),
 	SalesTerritoryID				NUMERIC(4));
-
+-- deleted problematic SalesTerritoryID as foreign key feature. Unnecessary constraint in this context with a fixed dataset.
 -- Create Skill_T table
 
 CREATE TABLE Skill_T (
