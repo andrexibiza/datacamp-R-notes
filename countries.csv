@@ -1,4 +1,4 @@
-CountryID;CountryName;CountryCode
+﻿CountryID;CountryName;CountryCode
 1;Armenia;AN
 2;Canada;FO
 3;Belize;MK
@@ -107,7 +107,7 @@ CountryID;CountryName;CountryCode
 106;Cyprus;SE
 107;Ghana;KN
 108;Pakistan;GB
-109;Runion;BH
+109;Réunion;BH
 110;Croatia;BT
 111;Venezuela;AW
 112;Antarctica;PN
@@ -145,7 +145,7 @@ CountryID;CountryName;CountryCode
 144;Andorra;GY
 145;United Kingdom;TG
 146;Australia;NA
-147;Cte d'Ivoire;ZW
+147;Côte d'Ivoire;ZW
 148;Mali;BF
 149;India;TV
 150;Cuba;CA
