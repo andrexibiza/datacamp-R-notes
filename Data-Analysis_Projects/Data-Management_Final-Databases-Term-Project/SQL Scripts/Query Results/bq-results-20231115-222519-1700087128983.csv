@@ -1,0 +1,577 @@
+CityName,CountryName,SaleMonth,TotalSales
+Jackson,United States,3,11702390.31
+Tucson,United States,3,11626231.67
+Tucson,United States,1,11610731.67
+Sacramento,United States,3,11452499.27
+Jackson,United States,1,11434782.28
+Fort Wayne,United States,3,11425318.17
+Sacramento,United States,1,11417519.21
+Columbus,United States,3,11393144.76
+Rochester,United States,1,11314203.32
+Indianapolis,United States,1,11305470.82
+Charlotte,United States,1,11304393.42
+Indianapolis,United States,3,11297819.06
+Fort Wayne,United States,1,11285178
+San Antonio,United States,3,11280090.86
+Colorado,United States,1,11273609.98
+San Antonio,United States,1,11247658.31
+Yonkers,United States,1,11240821.42
+Charlotte,United States,3,11231002.8
+Tucson,United States,4,11205738.87
+Newark,United States,1,11188149.56
+Honolulu,United States,3,11186111.75
+Sacramento,United States,4,11179805.9
+Spokane,United States,3,11178585.73
+Albuquerque,United States,3,11169450.19
+New York,United States,3,11165665.2
+Phoenix,United States,3,11151834.48
+Montgomery,United States,3,11139757.65
+Arlington,United States,1,11137945.13
+New York,United States,1,11128913.05
+St. Petersburg,United States,3,11125977.1
+Las Vegas,United States,3,11101313.68
+Madison,United States,3,11099615.73
+Phoenix,United States,1,11095055.72
+St. Petersburg,United States,1,11093549.88
+Columbus,United States,1,11091174.43
+Glendale,United States,1,11064370.49
+Stockton,United States,3,11063281.06
+Rochester,United States,3,11063036.59
+Anchorage,United States,3,11059311.38
+Fort Wayne,United States,4,11050926.19
+Las Vegas,United States,1,11043918.02
+Glendale,United States,3,11042807.31
+Mesa,United States,1,11032083.65
+Greensboro,United States,1,11027202.27
+Memphis,United States,1,11016066.06
+Albuquerque,United States,1,11012555.91
+Indianapolis,United States,4,11011293.36
+Colorado,United States,3,11007566.86
+Anaheim,United States,3,10992143.04
+Yonkers,United States,3,10991626.24
+Jackson,United States,4,10989923.4
+Hialeah,United States,3,10972249.2
+Baton Rouge,United States,3,10970014.67
+Shreveport,United States,1,10963101.71
+Oklahoma,United States,3,10959067.67
+Honolulu,United States,1,10957692.65
+Baton Rouge,United States,1,10942088.49
+Dayton,United States,1,10939450.97
+Oakland,United States,3,10938284.41
+Hialeah,United States,1,10937675.14
+Seattle,United States,3,10922246.43
+Anaheim,United States,1,10922060.18
+Shreveport,United States,3,10914710.24
+Montgomery,United States,1,10912573
+Newark,United States,3,10904760.51
+Tampa,United States,1,10898034.56
+Dayton,United States,3,10894714.36
+Columbus,United States,4,10892311.91
+Dallas,United States,3,10882722.53
+Madison,United States,1,10882358.96
+Memphis,United States,3,10881952.67
+El Paso,United States,3,10871464.26
+San Diego,United States,3,10869353.71
+Jacksonville,United States,1,10868175.3
+Anchorage,United States,1,10867948.42
+Jacksonville,United States,3,10866999.15
+Oklahoma,United States,1,10859936.54
+Greensboro,United States,4,10856525.11
+Corpus Christi,United States,1,10844149.74
+Arlington,United States,4,10841795.59
+Cincinnati,United States,3,10841749.17
+El Paso,United States,1,10830516.8
+Louisville,United States,3,10828574.14
+Greensboro,United States,3,10827112.71
+Chicago,United States,1,10825085.63
+Oakland,United States,1,10821743.87
+Arlington,United States,3,10817666.33
+Birmingham,United States,1,10817398.28
+Mesa,United States,3,10816282.52
+Jersey,United States,1,10804162.6
+Miami,United States,3,10801159.59
+Raleigh,United States,3,10798045.39
+Cincinnati,United States,1,10795775.78
+Montgomery,United States,4,10794209.25
+Raleigh,United States,1,10793450.84
+Spokane,United States,4,10789398.38
+Cleveland,United States,1,10788162.32
+San Antonio,United States,4,10783151.14
+Oakland,United States,4,10781886.46
+Lincoln,United States,3,10780829.36
+Newark,United States,4,10774936.35
+Stockton,United States,1,10771541.74
+Pittsburgh,United States,1,10769429.68
+Mesa,United States,4,10768584.02
+St. Louis,United States,3,10765314.67
+Shreveport,United States,4,10759437.65
+St. Louis,United States,1,10758608.73
+Memphis,United States,4,10752739.04
+Norfolk,United States,1,10748408.87
+Corpus Christi,United States,3,10747174.04
+Phoenix,United States,4,10744984.16
+Houston,United States,1,10733301.06
+Little Rock,United States,3,10732299.76
+San Diego,United States,1,10726848.4
+Lubbock,United States,3,10716264.12
+Charlotte,United States,4,10713026.68
+Norfolk,United States,3,10709190.59
+Tampa,United States,3,10708549.05
+Denver,United States,3,10706232.89
+Hialeah,United States,4,10704435.4
+Miami,United States,1,10703305.17
+Washington,United States,1,10702833.91
+Santa Ana,United States,3,10701543.82
+Yonkers,United States,4,10700644.97
+Spokane,United States,1,10692514.18
+Detroit,United States,3,10691336.55
+Colorado,United States,4,10689864.83
+Garland,United States,1,10688898.8
+Kansas,United States,1,10686680.6
+Detroit,United States,1,10685123.66
+Little Rock,United States,1,10682110.84
+Birmingham,United States,3,10673220.7
+Richmond,United States,3,10673083.71
+New York,United States,4,10661714.54
+Des Moines,United States,3,10658395.62
+Lincoln,United States,1,10651443.64
+Austin,United States,3,10650608.98
+Madison,United States,4,10646830.43
+Boston,United States,3,10643520.29
+St. Petersburg,United States,4,10641063.43
+Dallas,United States,1,10639200.43
+Pittsburgh,United States,3,10634568.53
+Denver,United States,1,10630976.08
+Portland,United States,1,10628663.57
+Jersey,United States,3,10625377.01
+Washington,United States,3,10620217.08
+Albuquerque,United States,4,10618854.63
+Anaheim,United States,4,10616049.74
+Santa Ana,United States,1,10616024.69
+Rochester,United States,4,10604568.94
+Houston,United States,3,10604125.63
+Bakersfield,United States,1,10602553.57
+Nashville,United States,1,10601737.43
+Boston,United States,1,10601224.16
+Lubbock,United States,1,10595901.3
+Glendale,United States,4,10590872.56
+Chicago,United States,3,10589610.29
+Honolulu,United States,4,10586462.66
+Stockton,United States,4,10580048.08
+Austin,United States,1,10574322.57
+St. Paul,United States,3,10572638.25
+Lincoln,United States,4,10570501.27
+Corpus Christi,United States,4,10566269.09
+Las Vegas,United States,4,10562429.4
+Garland,United States,3,10561500.94
+Portland,United States,3,10559646.34
+Miami,United States,4,10556602.41
+Aurora,United States,3,10554786.87
+Baton Rouge,United States,4,10553678.95
+Toledo,United States,3,10550708.48
+Toledo,United States,1,10543780.26
+Cleveland,United States,3,10538613.71
+Riverside,United States,1,10534086.03
+St. Louis,United States,4,10529028.34
+Richmond,United States,1,10528506.93
+Cincinnati,United States,4,10526430.54
+Seattle,United States,1,10525609.7
+Louisville,United States,1,10525579.55
+Tucson,United States,2,10524957.53
+Dallas,United States,4,10524461.67
+Nashville,United States,3,10515716.21
+Fremont,United States,1,10508156.65
+El Paso,United States,4,10500864.81
+Kansas,United States,3,10499481.92
+St. Paul,United States,1,10496329.81
+San Diego,United States,4,10496163.59
+Oklahoma,United States,4,10487945.78
+Tacoma,United States,3,10487089.38
+Jackson,United States,2,10481514.1
+Wichita,United States,3,10461400.93
+Riverside,United States,3,10452427.91
+Kansas,United States,4,10442791.57
+Mobile,United States,1,10442543.82
+Minneapolis,United States,1,10442151.64
+Tulsa,United States,1,10438237.34
+Fresno,United States,3,10430267.44
+Fremont,United States,3,10430087.14
+Dayton,United States,4,10428384.34
+Mobile,United States,3,10426443.4
+Fresno,United States,1,10425872.53
+Jacksonville,United States,4,10422927.87
+Tulsa,United States,3,10422014.03
+Anchorage,United States,4,10420946.79
+Akron,United States,1,10420641.74
+Buffalo,United States,1,10420568.66
+Los Angeles,United States,1,10419493.88
+Lubbock,United States,4,10418440.08
+Portland,United States,4,10417334.51
+Des Moines,United States,1,10398891.91
+Grand Rapids,United States,3,10397873.08
+Detroit,United States,4,10392447.55
+Grand Rapids,United States,1,10391131.98
+Baltimore,United States,3,10386240.06
+Tacoma,United States,1,10378340.3
+Akron,United States,3,10377962.69
+San Francisco,United States,3,10377041.37
+Little Rock,United States,4,10374294.72
+Buffalo,United States,3,10374251.84
+Aurora,United States,1,10367098.01
+Louisville,United States,4,10364753.42
+Wichita,United States,1,10355025.89
+San Francisco,United States,1,10353623.7
+Tampa,United States,4,10348602.59
+Virginia Beach,United States,1,10337773.76
+Bakersfield,United States,4,10337010
+Baltimore,United States,1,10335045.57
+Milwaukee,United States,1,10332594.94
+Denver,United States,4,10331549.33
+San Jose,United States,3,10327539.49
+Cleveland,United States,4,10322123.92
+Bakersfield,United States,3,10317360.78
+Garland,United States,4,10307034.37
+Milwaukee,United States,3,10305419.49
+Pittsburgh,United States,4,10293977.98
+Sacramento,United States,2,10291882.32
+Santa Ana,United States,4,10288605.35
+New Orleans,United States,1,10286087.35
+Jersey,United States,4,10285111.5
+Raleigh,United States,4,10283955.87
+Philadelphia,United States,3,10282828.8
+Norfolk,United States,4,10265551.37
+Philadelphia,United States,1,10263136.02
+Fremont,United States,4,10247949.86
+Birmingham,United States,4,10240843.79
+Virginia Beach,United States,3,10240266.89
+Los Angeles,United States,3,10236134.18
+Minneapolis,United States,3,10235804.5
+Chicago,United States,4,10233519.08
+Fort Wayne,United States,2,10215192.79
+Atlanta,United States,3,10207515.28
+Houston,United States,4,10202881.14
+Richmond,United States,4,10199832.04
+New Orleans,United States,3,10193203.61
+Boston,United States,4,10188429.93
+Long Beach,United States,1,10176460.58
+Columbus,United States,2,10175634.96
+Minneapolis,United States,4,10172738.41
+Aurora,United States,4,10170882.5
+Milwaukee,United States,4,10159239.51
+Long Beach,United States,3,10153226.14
+Baltimore,United States,4,10151019.17
+Austin,United States,4,10142717.66
+Washington,United States,4,10139596.65
+Philadelphia,United States,4,10137849.39
+Wichita,United States,4,10137643.11
+Des Moines,United States,4,10136680.93
+San Jose,United States,1,10136528.56
+Rochester,United States,2,10112549.33
+Seattle,United States,4,10111796.23
+Buffalo,United States,4,10110150.21
+Tacoma,United States,4,10095014.07
+Omaha,United States,3,10084936.72
+San Antonio,United States,2,10084425.98
+Fort Worth,United States,3,10083242.98
+Phoenix,United States,2,10080086.51
+Greensboro,United States,2,10078642.51
+Riverside,United States,4,10065410.42
+Los Angeles,United States,4,10063568.2
+Yonkers,United States,2,10063263.28
+Newark,United States,2,10062543.97
+Charlotte,United States,2,10042853.57
+San Jose,United States,4,10039842.03
+Akron,United States,4,10037646.2
+Fort Worth,United States,1,10034998.94
+Toledo,United States,4,10026848.58
+Las Vegas,United States,2,10022425.12
+Fresno,United States,4,10018404.17
+Honolulu,United States,2,10017143.48
+Anaheim,United States,2,10000435.3
+Indianapolis,United States,2,9994251.34
+Albuquerque,United States,2,9994145.07
+Tulsa,United States,4,9984608.63
+Spokane,United States,2,9978406.91
+St. Paul,United States,4,9971839.53
+San Francisco,United States,4,9954540.78
+Oakland,United States,2,9949741.65
+Madison,United States,2,9944085.41
+Atlanta,United States,1,9936791.81
+Nashville,United States,4,9933572.04
+Glendale,United States,2,9926971.73
+Virginia Beach,United States,4,9920806.11
+Jacksonville,United States,2,9907917.99
+Mobile,United States,4,9907734.48
+St. Louis,United States,2,9906978.16
+Grand Rapids,United States,4,9888842.74
+Hialeah,United States,2,9872823.82
+Mesa,United States,2,9861637.8
+Arlington,United States,2,9858761.53
+Baton Rouge,United States,2,9853009.46
+Omaha,United States,1,9852318.33
+New York,United States,2,9848705.42
+New Orleans,United States,4,9843364.31
+Dayton,United States,2,9831369.71
+Corpus Christi,United States,2,9829018.19
+Memphis,United States,2,9823043.4
+Colorado,United States,2,9820015.68
+El Paso,United States,2,9803345.73
+Atlanta,United States,4,9803217.31
+St. Petersburg,United States,2,9795736.8
+Washington,United States,2,9786357.58
+Stockton,United States,2,9763453.38
+Dallas,United States,2,9762446.74
+Louisville,United States,2,9760176.11
+Anchorage,United States,2,9757564.61
+Shreveport,United States,2,9752610.54
+Houston,United States,2,9751960.81
+Little Rock,United States,2,9749981.87
+Seattle,United States,2,9724429.13
+Oklahoma,United States,2,9708254.53
+Cincinnati,United States,2,9698295.98
+Lincoln,United States,2,9697155.1
+Bakersfield,United States,2,9695204.54
+Norfolk,United States,2,9688917.72
+Portland,United States,2,9661926.53
+Long Beach,United States,4,9650369.93
+Garland,United States,2,9648678.48
+Austin,United States,2,9624348.96
+Denver,United States,2,9617123.3
+San Diego,United States,2,9617042.07
+Fort Worth,United States,4,9616671.33
+Omaha,United States,4,9610191.46
+Aurora,United States,2,9605137.46
+Kansas,United States,2,9604868.74
+Miami,United States,2,9600982.68
+Pittsburgh,United States,2,9596156.04
+Santa Ana,United States,2,9594646.08
+Lubbock,United States,2,9590207.34
+Raleigh,United States,2,9589578.46
+Montgomery,United States,2,9589119.74
+Chicago,United States,2,9568774.2
+Detroit,United States,2,9562407.35
+Jersey,United States,2,9556390.04
+Tampa,United States,2,9550113.51
+Birmingham,United States,2,9547442.17
+Fremont,United States,2,9546794.27
+Cleveland,United States,2,9544811.03
+Wichita,United States,2,9509016.33
+Richmond,United States,2,9487670.32
+Toledo,United States,2,9466764.28
+Baltimore,United States,2,9465194.51
+St. Paul,United States,2,9462307.92
+Des Moines,United States,2,9448534.19
+Philadelphia,United States,2,9441264.85
+Mobile,United States,2,9440758.26
+Boston,United States,2,9430875.49
+Milwaukee,United States,2,9422537.54
+Grand Rapids,United States,2,9411729.15
+Tulsa,United States,2,9394898.42
+Riverside,United States,2,9375035.4
+Nashville,United States,2,9361476.7
+Akron,United States,2,9347651.78
+Los Angeles,United States,2,9338712.31
+Virginia Beach,United States,2,9316927.39
+Tacoma,United States,2,9311078.19
+Buffalo,United States,2,9301247.29
+Minneapolis,United States,2,9267219.08
+Fort Worth,United States,2,9256160.05
+New Orleans,United States,2,9224921.41
+San Jose,United States,2,9205940.47
+Fresno,United States,2,9153184.49
+Atlanta,United States,2,9140411.27
+San Francisco,United States,2,9139078.93
+Omaha,United States,2,9012422.64
+Long Beach,United States,2,8904378.51
+Tucson,United States,5,3382052.08
+Charlotte,United States,5,3353941.89
+Sacramento,United States,5,3351649.9
+Jackson,United States,5,3311869.11
+Columbus,United States,5,3311817.8
+Indianapolis,United States,5,3311618.8
+Yonkers,United States,5,3308871.28
+Phoenix,United States,5,3290653.17
+Hialeah,United States,5,3276962.75
+Norfolk,United States,5,3272616.43
+Fort Wayne,United States,5,3264533.97
+San Antonio,United States,5,3230105.78
+Little Rock,United States,5,3217769.9
+Miami,United States,5,3215863.1
+Tampa,United States,5,3207360.89
+Raleigh,United States,5,3199064.69
+Colorado,United States,5,3198434.14
+Glendale,United States,5,3198270.47
+Greensboro,United States,5,3195776.81
+Anaheim,United States,5,3190559.25
+Newark,United States,5,3179843.59
+Detroit,United States,5,3177409.7
+New York,United States,5,3175483.4
+Albuquerque,United States,5,3174824.34
+Arlington,United States,5,3172170.37
+Spokane,United States,5,3172017.67
+Rochester,United States,5,3170129.24
+Dayton,United States,5,3169925.75
+St. Paul,United States,5,3167447.56
+St. Petersburg,United States,5,3167143.48
+San Diego,United States,5,3164029.68
+Bakersfield,United States,5,3163925.23
+Corpus Christi,United States,5,3160433.03
+Baton Rouge,United States,5,3159922.08
+Montgomery,United States,5,3159787.2
+St. Louis,United States,5,3157583.99
+Denver,United States,5,3151774.51
+Cleveland,United States,5,3150673.38
+Madison,United States,5,3148060.18
+Mesa,United States,5,3147887.91
+Oakland,United States,5,3145997.09
+Dallas,United States,5,3144453.46
+Louisville,United States,5,3143807.4
+El Paso,United States,5,3142807.7
+Kansas,United States,5,3142728.23
+Honolulu,United States,5,3137364.1
+Las Vegas,United States,5,3135329.64
+Cincinnati,United States,5,3124937.53
+Anchorage,United States,5,3124851.35
+Jersey,United States,5,3120149.14
+Houston,United States,5,3119504.74
+Memphis,United States,5,3118607.03
+Fremont,United States,5,3116041.67
+Richmond,United States,5,3111588.78
+San Jose,United States,5,3104719.52
+Milwaukee,United States,5,3100252.77
+Shreveport,United States,5,3099175.3
+Boston,United States,5,3098148.55
+Portland,United States,5,3093405.62
+Jacksonville,United States,5,3090962.41
+Seattle,United States,5,3089282.89
+Tacoma,United States,5,3083309.12
+Oklahoma,United States,5,3082476.94
+Birmingham,United States,5,3080630.4
+Lubbock,United States,5,3078823.71
+Aurora,United States,5,3071437.84
+Garland,United States,5,3070143.54
+Wichita,United States,5,3068787.66
+Lincoln,United States,5,3067759.66
+Chicago,United States,5,3066521.61
+Nashville,United States,5,3063211.87
+Toledo,United States,5,3055642.19
+Austin,United States,5,3054693.98
+Stockton,United States,5,3052943.53
+Grand Rapids,United States,5,3050526.54
+Riverside,United States,5,3050477.6
+Mobile,United States,5,3049489.14
+Los Angeles,United States,5,3044708.2
+Buffalo,United States,5,3036173.62
+Tulsa,United States,5,3035650.16
+Washington,United States,5,3032523.92
+Baltimore,United States,5,3024681.97
+Akron,United States,5,3024520.4
+Pittsburgh,United States,5,3022897.56
+Des Moines,United States,5,3021025.56
+Fort Worth,United States,5,3017481.84
+Santa Ana,United States,5,3003404.39
+New Orleans,United States,5,2999952.66
+Fresno,United States,5,2998095.98
+Minneapolis,United States,5,2995892.83
+San Francisco,United States,5,2970514.17
+Virginia Beach,United States,5,2954501.91
+Philadelphia,United States,5,2898664.65
+Long Beach,United States,5,2893192.7
+Atlanta,United States,5,2882359.14
+Omaha,United States,5,2844954.4
+Albuquerque,United States,,501481.68
+Sacramento,United States,,497802.39
+Jackson,United States,,495669.03
+Hialeah,United States,,493911.02
+St. Petersburg,United States,,492814.93
+San Antonio,United States,,491740.03
+Greensboro,United States,,490127.82
+Tucson,United States,,489496.69
+Spokane,United States,,487121.06
+Cincinnati,United States,,482691.21
+Washington,United States,,479748.53
+San Diego,United States,,477930.58
+Columbus,United States,,475205.84
+Charlotte,United States,,474951.72
+Pittsburgh,United States,,473284.91
+Montgomery,United States,,472635.21
+Grand Rapids,United States,,469995.25
+Denver,United States,,469819.38
+Memphis,United States,,469383.37
+Phoenix,United States,,468812.96
+Las Vegas,United States,,468717.44
+El Paso,United States,,467320.3
+Oakland,United States,,467039.54
+Bakersfield,United States,,465022.3
+Glendale,United States,,463621.88
+Birmingham,United States,,462709.54
+Portland,United States,,462148.86
+Toledo,United States,,462024.49
+Kansas,United States,,460128.56
+Buffalo,United States,,460095.01
+Indianapolis,United States,,458583.28
+Richmond,United States,,458383.71
+New York,United States,,457669.08
+Lubbock,United States,,456974.22
+Corpus Christi,United States,,456316.83
+Houston,United States,,456165.7
+Oklahoma,United States,,455148.07
+Norfolk,United States,,454963.45
+Detroit,United States,,453176.62
+Mesa,United States,,452832.34
+Baton Rouge,United States,,452162.34
+Omaha,United States,,452083.48
+Little Rock,United States,,451280.68
+St. Louis,United States,,450094.82
+Anaheim,United States,,449284.99
+Colorado,United States,,449252.51
+Fort Wayne,United States,,448978.51
+Arlington,United States,,447371.78
+Yonkers,United States,,446185.41
+Jacksonville,United States,,446159.2
+Mobile,United States,,446151.66
+San Jose,United States,,445692.79
+Des Moines,United States,,444958.36
+Minneapolis,United States,,444522.59
+Garland,United States,,444197.96
+Cleveland,United States,,444036.22
+New Orleans,United States,,443864.67
+Tacoma,United States,,443863.08
+Miami,United States,,442867.88
+Newark,United States,,442539.66
+Austin,United States,,442168.49
+Atlanta,United States,,441596.64
+Raleigh,United States,,441281.09
+Louisville,United States,,440936.9
+Honolulu,United States,,438936.15
+Nashville,United States,,437542.98
+Akron,United States,,436858.18
+Seattle,United States,,436782.47
+Tampa,United States,,435584.55
+Madison,United States,,433662.15
+Boston,United States,,432772.17
+Jersey,United States,,432693.72
+Baltimore,United States,,432623.5
+St. Paul,United States,,432096.61
+Stockton,United States,,431855.27
+Shreveport,United States,,431545.3
+Dayton,United States,,431290.69
+Fresno,United States,,431276.1
+Tulsa,United States,,429508.86
+Anchorage,United States,,429155.35
+Long Beach,United States,,428958.45
+Los Angeles,United States,,427313.41
+San Francisco,United States,,427025.66
+Santa Ana,United States,,426554.18
+Riverside,United States,,426343.88
+Chicago,United States,,421663.6
+Dallas,United States,,421532.52
+Milwaukee,United States,,420147.72
+Virginia Beach,United States,,419843.19
+Lincoln,United States,,415656.08
+Wichita,United States,,415193.66
+Philadelphia,United States,,415147.97
+Rochester,United States,,414901.83
+Aurora,United States,,413094.32
+Fort Worth,United States,,411209.75
+Fremont,United States,,409855.58
