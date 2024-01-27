@@ -1,0 +1,22 @@
+---
+title: "Data5100_Week2_Discussion"
+author: "Andrex Ibiza, MBA"
+date: "2024-01-17"
+output: word_document
+---
+
+This week, so far, the most broadly useful pro tip I've encountered in RStudio is the built-in selection of cheat sheets! I've been using RStudio for a while now, and I've never noticed this feature.  I've been using the cheat sheets on the RStudio website, but I like the idea of having them built into the IDE.  I'm sure I'll be using this feature a lot in the future. To find them, go to the Help menu and select Cheatsheets.  
+
+Options include:
+- RStudio IDE Cheat Sheet
+- Data Transformation with dplyr
+- Data Viaualization with ggplot2
+- List manipulation with purrr
+- Package development with devtools
+- Web applications with shiny
+- Interfacing Spark with sparklyr
+- R Markdown Cheat Sheet
+- R Markdown Reference Guide
+
+Handy Pro Tip #2:
+You can use DataCamp Workspace to code in R too! Previously, I had been under the impression that Python was the only option when creating a new blank notebook. The default options appear as "Start writing...AI, Text, Python, SQL, Chart.
