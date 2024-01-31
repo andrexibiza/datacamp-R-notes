@@ -12,6 +12,12 @@ library(ggplot2)
 # Load penguins_clean.rds from Week 2 checkpoint
 penguins_clean <- readRDS(file = "penguins_clean.rds")
 
+# Update x-axis labels 
+penguins_clean$species <- factor(penguins_clean$species, 
+                                 labels = c("Adelie", 
+                                            "Chinstrap", 
+                                            "Gentoo"))
+
 # Scatter plot culmen_length_mm x culmen_depth_mm color by species
 posn_j <- position_jitter(0.1,
                           seed = 666)
@@ -26,12 +32,6 @@ ggplot(penguins_clean,
   scale_color_discrete("Species") +
   theme_classic()
   
-# Update x-axis labels in the boxplot
-penguins_clean$species <- factor(penguins_clean$species, 
-                                 labels = c("Adelie", 
-                                            "Chinstrap", 
-                                            "Gentoo"))
-
 # Boxplot of body mass by species
 ggplot(penguins_clean, 
        aes(x=species, 
@@ -64,8 +64,12 @@ ggplot(penguins_clean, aes(x=culmen_depth_mm, fill=species)) +
   theme_classic() +
   scale_y_continuous(labels = scales::comma)
 
-# Segmented bar plot of species by region
-ggplot(penguins_clean, aes(x = region, fill = species)) +
+# Segmented bar plot of species by island
+ggplot(penguins_clean, aes(x = island, fill = species)) +
   geom_bar(position = "stack") +
-  labs(title = "Segmented Bar Plot of Species by Region", x = "Region", y = "Count") +
+  labs(title = "Segmented Bar Plot of Species Counts by Island", x = "Island", y = "Count") +
   theme_classic()
+
+# Write new csv and rds files
+write.csv(penguins_clean, "penguins_clean_w3.csv") # does not preserve variable structure
+write_rds(penguins_clean, "penguins_clean_w3.rds") # preserves variable structure
