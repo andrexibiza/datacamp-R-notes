@@ -54,28 +54,26 @@ cat("By Chebyshev's Rule, at least", percent, "% of the penguins' culmen lengths
 # greater than 3 or less than -3. Let's calculate the z-scores for the 
 # numerical variables and identify any outliers.
 
-# Calculate z-scores for the numerical variables in the penguins_numeric dataset
-z_scores <- as.data.frame(scale(penguins_numeric[,-1])) # Exclude sample_number
-names(z_scores) <- names(penguins_numeric[,-1]) # Assign correct column names
+# Calculate z-score for flipper_length_mm
+df$z_flipper_length_mm <- (df$flipper_length_mm - mean(df$flipper_length_mm))/sd(df$flipper_length_mm)
+zdf_flipper_length_mm <- df %>% filter(z_flipper_length_mm > 3 | z_flipper_length_mm < -3)
+outliers_flipper_length_mm <- zdf_flipper_length_mm$flipper_length_mm
+## There are no outliers in flipper_length_mm.
 
-# Check for outliers (z-score > 3 or z-score < -3)
-outliers <- apply(z_scores, 2, function(x) sum(x > 3 | x < -3))
+# Calculate z-scores for 'culmen_depth_mm'
+df$z_culmen_depth_mm <- (df$culmen_depth_mm - mean(df$culmen_depth_mm)) / sd(df$culmen_depth_mm)
+zdf_culmen_depth_mm <- df %>% filter(z_culmen_depth_mm > 3 | z_culmen_depth_mm < -3)
+outliers_culmen_depth_mm <- zdf_culmen_depth_mm$culmen_depth_mm
+## There are no outliers for culmen_depth_mm
 
-# Output the number of outliers for each variable
-outliers
+# Calculate Z-score for body_mass_g
+df$z_body_mass_g <- (df$body_mass_g - mean(df$body_mass_g)) / sd(df$body_mass_g)
+zdf_body_mass_g <- df %>% filter(z_body_mass_g > 3 | z_body_mass_g < -3)
+outliers_body_mass_g <- zdf_body_mass_g$body_mass_g
+## There are no outliers for body_mass_g
 
-# The results show zero outliers in this data.
 
 ##### Coefficient of Variation Comparison
-
-# The coefficient of variation (CV) is a statistical measure of the dispersion of 
-# data points in a data series around the mean. It is calculated as the ratio of 
-# the standard deviation to the mean, and it is often expressed as a percentage. 
-# The CV is useful because it allows for comparison of the variability of different 
-# datasets with different units or means. We will calculate the CV for numerical 
-# variables from the `penguins_numeric` dataframe and compare their variability.
-
-# Calculate the coefficient of variation for selected numerical variables
 coefficient_of_variation <- function(x) {
   (sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE)) * 100
 }
