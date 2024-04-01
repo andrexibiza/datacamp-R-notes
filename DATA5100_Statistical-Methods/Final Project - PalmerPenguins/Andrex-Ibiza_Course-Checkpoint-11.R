@@ -31,41 +31,36 @@ Gentoo_weights_df <- df %>%
          species == 'Gentoo') %>%     # Gentoo species
   select(weight) 
 Gentoo_weights <- Gentoo_weights_df$weight # initialize Gentoo weights vector
- 
-####I STOPPED RIGHT HERE CONTINUE BELOW PLEASE
-Northeast_heights <- Northeast_heights_df$height
-South_heights <- South_heights_df$height
-West_heights <- West_heights_df$height
 
-mu_Midwest <- mean(Midwest_heights)
-mu_Northeast <- mean(Northeast_heights)
-mu_South <- mean(South_heights)
-mu_West <- mean(West_heights)
-mu <- mean(df$height)
+mu_Adelie <- mean(Adelie_weights)
+mu_Chinstrap <- mean(Chinstrap_weights)
+mu_Gentoo <- mean(Gentoo_weights)
+mu <- mean(df$weight)
 
-cat('The population mean of NBA heights is:', mu, '.')
-cat('The population mean of NBA heights in the Midwest, Northeast, South, and West, respectively, are:', mu_Midwest, mu_Northeast, mu_South, mu_West,'.')
+cat('The population mean of Adelie penguin weights is:', mu_Adelie, '.')
+cat('The population mean of Chinstrap penguin weights is:', mu_Chinstrap, '.')
+cat('The population mean of Gentoo penguin weights is:', mu_Gentoo, '.')
+cat('The population mean of all penguin weights is:', mu, '.')
+
+sigma_squared_Adelie <- sd(Adelie_weights)^2
+sigma_squared_Chinstrap <- sd(Chinstrap_weights)^2
+sigma_squared_Gentoo <- sd(Gentoo_weights)
+sigma_squared <- sd(df$weight)^2
 
 
-sigma_squared_Midwest <- sd(Midwest_heights)^2
-sigma_squared_Northeast <- sd(Northeast_heights)^2
-sigma_squared_South <- sd(South_heights)^2
-sigma_squared_West <- sd(West_heights)^2
-sigma_squared <- sd(df$height)^2
-
-cat('The population variance of NBA heights is:', sigma_squared, '.')
-cat('The population variances of NBA heights in the Midwest, Northeast, South, and West, respectively, are:', sigma_squared_Midwest, sigma_squared_Northeast, sigma_squared_South, sigma_squared_West,'.')
-cat('The four population variances of NBA heights are close.') 
+cat('The population variance of penguin weights is:', sigma_squared, '.')
+cat('The population variances of penguin weights for species Adelie, Chinstrap, and Gentoo, respectively, are:', sigma_squared_Adelie, sigma_squared_Chinstrap, sigma_squared_Gentoo '.')
+cat('The population variances of penguin heights are close.') 
 #Could use F test to test population variances
 
 
-#Take samples of size 20 from each us region
+#Take samples of size 20 from each penguin species
 
 n <- 20 #sample size
-sample_heights_Midwest <- sample(Midwest_heights,n)
+sample_heights_ <- sample(Midwest_heights,n)
 sample_heights_Northeast <- sample(Northeast_heights,n)
 sample_heights_South <- sample(South_heights,n)
-sample_heights_West <- sample(West_heights,n)
+
 
 #Find mean and variance of each sample
 
