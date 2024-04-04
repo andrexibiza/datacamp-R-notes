@@ -11,7 +11,7 @@ str(df)
 #Weights are generally normally distributed.
 #Population variances should be equal.
 
-m <- aov(weight ~ species, df) 
+m <- aov(weight ~ species, df)
 summary(m)
 
 # Perform Tukey's HSD test
