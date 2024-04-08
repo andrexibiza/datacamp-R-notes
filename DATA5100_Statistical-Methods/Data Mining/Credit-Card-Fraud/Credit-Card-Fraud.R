@@ -2,6 +2,7 @@
 library(tidyverse)
 library(naivebayes)
 library(psych)
+library(naniar)
 
 # Load credit card fraud data
 df <- read.csv("credit_card_fraud.csv")
