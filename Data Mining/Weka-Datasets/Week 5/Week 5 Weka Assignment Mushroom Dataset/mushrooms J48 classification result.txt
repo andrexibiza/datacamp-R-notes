@@ -1,0 +1,346 @@
+mushrooms J48 classification results 2024-04-12
+
+J48 -C 0.25 -M 2
+10-fold cross validation
+
+=== Run information ===
+
+Scheme:       weka.classifiers.trees.J48 -C 0.25 -M 2
+Relation:     mushrooms
+Instances:    8124
+Attributes:   23
+              class
+              cap-shape
+              cap-surface
+              cap-color
+              bruises?
+              odor
+              gill-attachment
+              gill-spacing
+              gill-size
+              gill-color
+              stalk-shape
+              stalk-root
+              stalk-surface-above-ring
+              stalk-surface-below-ring
+              stalk-color-above-ring
+              stalk-color-below-ring
+              veil-type
+              veil-color
+              ring-number
+              ring-type
+              spore-print-color
+              population
+              habitat
+Test mode:    10-fold cross-validation
+
+=== Classifier model (full training set) ===
+
+J48 pruned tree
+------------------
+
+odor = almond: edible (400.0)
+odor = anise: edible (400.0)
+odor = creosote: poisonous (192.0)
+odor = fishy: poisonous (576.0)
+odor = foul: poisonous (2160.0)
+odor = musty: poisonous (36.0)
+odor = none
+|   spore-print-color = black: edible (1296.0)
+|   spore-print-color = brown: edible (1344.0)
+|   spore-print-color = buff: edible (48.0)
+|   spore-print-color = chocolate: edible (48.0)
+|   spore-print-color = green: poisonous (72.0)
+|   spore-print-color = orange: edible (48.0)
+|   spore-print-color = purple: edible (0.0)
+|   spore-print-color = white
+|   |   gill-size = broad: edible (528.0)
+|   |   gill-size = narrow
+|   |   |   gill-spacing = close: poisonous (32.0)
+|   |   |   gill-spacing = crowded
+|   |   |   |   population = abundant: edible (0.0)
+|   |   |   |   population = clustered: poisonous (16.0)
+|   |   |   |   population = numerous: edible (0.0)
+|   |   |   |   population = scattered: edible (0.0)
+|   |   |   |   population = several: edible (48.0)
+|   |   |   |   population = solitary: edible (0.0)
+|   |   |   gill-spacing = distant: edible (0.0)
+|   spore-print-color = yellow: edible (48.0)
+odor = pungent: poisonous (256.0)
+odor = spicy: poisonous (576.0)
+
+Number of Leaves  : 	25
+
+Size of the tree : 	30
+
+
+Time taken to build model: 0 seconds
+
+=== Stratified cross-validation ===
+=== Summary ===
+
+Correctly Classified Instances        8124              100      %
+Incorrectly Classified Instances         0                0      %
+Kappa statistic                          1     
+Mean absolute error                      0     
+Root mean squared error                  0     
+Relative absolute error                  0      %
+Root relative squared error              0      %
+Total Number of Instances             8124     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     edible
+                 1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     poisonous
+Weighted Avg.    1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 4208    0 |    a = edible
+    0 3916 |    b = poisonous
+
+-----------------------------------------------------------------------------------------------------------
+=== Run information ===
+
+Scheme:       weka.classifiers.trees.J48 -C 0.25 -M 2
+Relation:     mushrooms
+Instances:    8124
+Attributes:   23
+              class
+              cap-shape
+              cap-surface
+              cap-color
+              bruises?
+              odor
+              gill-attachment
+              gill-spacing
+              gill-size
+              gill-color
+              stalk-shape
+              stalk-root
+              stalk-surface-above-ring
+              stalk-surface-below-ring
+              stalk-color-above-ring
+              stalk-color-below-ring
+              veil-type
+              veil-color
+              ring-number
+              ring-type
+              spore-print-color
+              population
+              habitat
+Test mode:    split 80.0% train, remainder test
+
+=== Classifier model (full training set) ===
+
+J48 pruned tree
+------------------
+
+odor = almond: edible (400.0)
+odor = anise: edible (400.0)
+odor = creosote: poisonous (192.0)
+odor = fishy: poisonous (576.0)
+odor = foul: poisonous (2160.0)
+odor = musty: poisonous (36.0)
+odor = none
+|   spore-print-color = black: edible (1296.0)
+|   spore-print-color = brown: edible (1344.0)
+|   spore-print-color = buff: edible (48.0)
+|   spore-print-color = chocolate: edible (48.0)
+|   spore-print-color = green: poisonous (72.0)
+|   spore-print-color = orange: edible (48.0)
+|   spore-print-color = purple: edible (0.0)
+|   spore-print-color = white
+|   |   gill-size = broad: edible (528.0)
+|   |   gill-size = narrow
+|   |   |   gill-spacing = close: poisonous (32.0)
+|   |   |   gill-spacing = crowded
+|   |   |   |   population = abundant: edible (0.0)
+|   |   |   |   population = clustered: poisonous (16.0)
+|   |   |   |   population = numerous: edible (0.0)
+|   |   |   |   population = scattered: edible (0.0)
+|   |   |   |   population = several: edible (48.0)
+|   |   |   |   population = solitary: edible (0.0)
+|   |   |   gill-spacing = distant: edible (0.0)
+|   spore-print-color = yellow: edible (48.0)
+odor = pungent: poisonous (256.0)
+odor = spicy: poisonous (576.0)
+
+Number of Leaves  : 	25
+
+Size of the tree : 	30
+
+
+Time taken to build model: 0 seconds
+
+=== Evaluation on test split ===
+
+Time taken to test model on test split: 0 seconds
+
+=== Summary ===
+
+Correctly Classified Instances        1625              100      %
+Incorrectly Classified Instances         0                0      %
+Kappa statistic                          1     
+Mean absolute error                      0     
+Root mean squared error                  0     
+Relative absolute error                  0      %
+Root relative squared error              0      %
+Total Number of Instances             1625     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     edible
+                 1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     poisonous
+Weighted Avg.    1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 844   0 |   a = edible
+   0 781 |   b = poisonous
+
+--------------------------------------------------------------------------------------------------------
+
+=== Run information ===
+
+Scheme:       weka.classifiers.trees.J48 -C 0.25 -M 2
+Relation:     mushrooms
+Instances:    8124
+Attributes:   23
+              class
+              cap-shape
+              cap-surface
+              cap-color
+              bruises?
+              odor
+              gill-attachment
+              gill-spacing
+              gill-size
+              gill-color
+              stalk-shape
+              stalk-root
+              stalk-surface-above-ring
+              stalk-surface-below-ring
+              stalk-color-above-ring
+              stalk-color-below-ring
+              veil-type
+              veil-color
+              ring-number
+              ring-type
+              spore-print-color
+              population
+              habitat
+Test mode:    split 70.0% train, remainder test
+
+=== Classifier model (full training set) ===
+
+J48 pruned tree
+------------------
+
+odor = almond: edible (400.0)
+odor = anise: edible (400.0)
+odor = creosote: poisonous (192.0)
+odor = fishy: poisonous (576.0)
+odor = foul: poisonous (2160.0)
+odor = musty: poisonous (36.0)
+odor = none
+|   spore-print-color = black: edible (1296.0)
+|   spore-print-color = brown: edible (1344.0)
+|   spore-print-color = buff: edible (48.0)
+|   spore-print-color = chocolate: edible (48.0)
+|   spore-print-color = green: poisonous (72.0)
+|   spore-print-color = orange: edible (48.0)
+|   spore-print-color = purple: edible (0.0)
+|   spore-print-color = white
+|   |   gill-size = broad: edible (528.0)
+|   |   gill-size = narrow
+|   |   |   gill-spacing = close: poisonous (32.0)
+|   |   |   gill-spacing = crowded
+|   |   |   |   population = abundant: edible (0.0)
+|   |   |   |   population = clustered: poisonous (16.0)
+|   |   |   |   population = numerous: edible (0.0)
+|   |   |   |   population = scattered: edible (0.0)
+|   |   |   |   population = several: edible (48.0)
+|   |   |   |   population = solitary: edible (0.0)
+|   |   |   gill-spacing = distant: edible (0.0)
+|   spore-print-color = yellow: edible (48.0)
+odor = pungent: poisonous (256.0)
+odor = spicy: poisonous (576.0)
+
+Number of Leaves  : 	25
+
+Size of the tree : 	30
+
+
+Time taken to build model: 0 seconds
+
+=== Evaluation on test split ===
+
+Time taken to test model on test split: 0 seconds
+
+=== Summary ===
+
+Correctly Classified Instances        2437              100      %
+Incorrectly Classified Instances         0                0      %
+Kappa statistic                          1     
+Mean absolute error                      0     
+Root mean squared error                  0     
+Relative absolute error                  0      %
+Root relative squared error              0      %
+Total Number of Instances             2437     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     edible
+                 1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     poisonous
+Weighted Avg.    1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 1253    0 |    a = edible
+    0 1184 |    b = poisonous
+
+
+
+
+
+
+
+
+
+
+
+______________________________________________________________________
+
+Gemini Pro 1.5 output
+______________________________________________________________________
+
+# J48 Classification of Mushroom Data: Flawless Performance Across Diverse Testing Scenarios
+
+	This analysis explores the efficacy of the J48 decision tree algorithm for classifying mushrooms as edible or poisonous based on a set of 22 physical attributes. We maintain a consistent model configuration with a confidence factor of 0.25 and a minimum of 2 instances per leaf, evaluating performance across three distinct testing scenarios: 10-fold cross-validation, an 80/20 train/test split, and a 70/30 train/test split.
+Unwavering Accuracy and Perfect Classification:
+Remarkably, the J48 classifier achieves 100% accuracy in all three testing scenarios, demonstrating its exceptional ability to distinguish between edible and poisonous mushrooms based on the provided features. This perfect classification is further reflected in a Kappa statistic of 1, signifying flawless agreement beyond chance.
+
+## Detailed Performance Analysis Across Testing Methods
+*	10-Fold Cross-Validation: With all 8124 instances correctly classified, this method ensures the model's ability to generalize effectively to unseen data. Both edible and poisonous classes exhibit perfect precision and recall, indicating flawless classification across the board.
+*	80/20 Train/Test Split: Maintaining the perfect classification streak, the model correctly identifies all 1625 instances in the test set. Again, both classes demonstrate perfect precision and recall, showcasing the model's robustness.
+*	70/30 Train/Test Split: Mirroring the performance of the other scenarios, the J48 classifier flawlessly classifies all 2437 instances in the test set. Perfect precision and recall for both edible and poisonous mushrooms underscore the model's consistent excellence.
+
+## Dominant Features and Decision Rules
+	Analysis of the decision tree structure across all runs reveals "odor" as the dominant splitting attribute, highlighting its crucial role in distinguishing between edible and poisonous mushrooms. Subsequent levels utilize features like "spore-print-color" and "gill-size" for further classification, indicating their contribution to the decision-making process.
+
+## Considerations and Future Directions
+While the J48 model achieves unparalleled performance on this dataset, several aspects warrant further exploration:
+*	Generalizability: Testing the model on external datasets with different mushroom species or ecological contexts is crucial to assess itsgeneralizability and ensure it isn't overfitting to the current data.
+*	Feature Importance Analysis: Investigating the relative importance of each attribute can provide deeper insights into the classification process and potentially identify redundant features for model simplification.
+*	Alternative Algorithms: Exploring other classification algorithms might offer a comparative perspective and potentially reveal additional insights into the data, even if they don't surpass J48's perfect accuracy.
+*	Explainability: Despite the model's exceptional performance, understanding the rationale behind its decisions remains important, especially in domains like mushroom identification where safety is paramount.
+
+## Conclusion
+The J48 decision tree algorithm exhibits flawless performance in classifying mushrooms as edible or poisonous, achieving perfect accuracy across various testing scenarios. The consistent dominance of "odor" as a key predictor highlights its significance in mushroom identification. While the model's performance is remarkable, further exploration of generalizability, feature importance, and alternative algorithms can provide a more comprehensive understanding of the problem and pave the way for future advancements in mushroom classification.
