@@ -23,3 +23,7 @@ set.seed(666)
 ind <- sample(2, nrow(df), replace = TRUE, prob = c(0.8, 0.2))
 train <- df[ind == 1, ]
 test <- df[ind == 2, ]
+
+# Naive Bayes model
+model <- naive_bayes(is_fraud ~ amt + merchant + category + state + city, data = train)
+model
