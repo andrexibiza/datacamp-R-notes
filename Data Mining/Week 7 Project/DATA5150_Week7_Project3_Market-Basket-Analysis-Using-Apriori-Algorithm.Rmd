@@ -1,0 +1,86 @@
+---
+title: "Market Basket Analysis Using the Apriori Algorithm"
+author: "Andrex Ibiza, MBA"
+date: "2024-04-22"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+# Market Basket Analysis in R Using the Apriori Algorithm
+
+![](images/clipboard-4230863363.png)
+
+The dataset contains the following columns:
+
+-   `InvoiceNo`: The invoice number. If this code starts with letter 'C', it indicates a cancellation.
+-   `StockCode`: Product (item) code.
+-   `Description`: Product (item) description.
+-   `Quantity`: The quantities of each product (item) per transaction.
+-   `InvoiceDate`: The date and time when each transaction occurred.
+-   `UnitPrice`: Product price per unit.
+-   `CustomerID`: Customer number.
+-   `Country`: Country name.
+
+```{r}
+# Load packages
+library(tidyverse)
+library(arules)
+
+# Read and preprocess data
+data <- read.csv("online_retail.csv", stringsAsFactors = FALSE)
+data <- data[!grepl("^C", data$InvoiceNo), ]  # Remove cancellations
+data <- data[!is.na(data$Description), ]  # Remove missing descriptions
+data <- data[data$Quantity > 0, ]  # Only positive quantities
+
+# Aggregate items into transactions
+transactions <- data %>%
+  group_by(InvoiceNo) %>%
+  summarise(Items = paste(unique(Description), collapse = ",")) %>%
+  ungroup()
+
+# Convert to transactions class
+trans_list <- strsplit(as.character(transactions$Items), ",")
+trans <- as(trans_list, "transactions")
+
+# Run apriori algorithm
+frequent_itemsets <- apriori(trans,
+                            parameter = list(supp = 0.05,  # Adjusted support threshold
+                                             conf = 0.1,   # Adjusted confidence threshold
+                                             target = "frequent itemsets"))
+
+# Inspect the frequent itemsets
+inspect(head(sort(frequent_itemsets, by="support"), 10))
+
+```
+
+```{R}
+# Calculate association rules using the apriori algorithm
+rules <- apriori(trans,
+                 parameter = list(supp = 0.025,  # Support threshold
+                                  conf = 0.1),  # Confidence threshold
+                 appearance = NULL,
+                 control = NULL,
+                 target = "rules")
+
+# Inspect the top 10 association rules sorted by confidence
+inspect(head(sort(rules, by="confidence"), 10))
+```
+
+```{R}
+library(arulesViz)
+inspectDT(rules)
+```
+
+```{R}
+# This visualization is INTERACTIVE. Please explore!
+library(plotly)
+plot(rules, engine = "plotly")
+```
+
+# Key Findings
+
+The market basket analysis, conducted using the Apriori algorithm on online retail data, revealed interesting insights into customer purchasing behavior. Several items demonstrated high support, indicating their frequent purchase. These included home decor items like the "WHITE HANGING HEART T-LIGHT HOLDER" and "JUMBO BAG RED RETROSPOT," as well as baking related products such as the "REGENCY CAKESTAND 3 TIER" and "PACK OF 72 RETROSPOT CAKE CASES." 
+
+Association rules further highlighted relationships between items. Strong associations were found among teacup and saucer sets, with purchases of one color frequently leading to purchases of another. Similarly, the "JUMBO BAG RED RETROSPOT" showed a strong association with the "JUMBO BAG STRAWBERRY," suggesting customers are drawn to this specific bag style. These findings can guide retailers in optimizing product placement, crossselling strategies, and promotional offers.
