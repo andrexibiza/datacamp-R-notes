@@ -2,7 +2,16 @@
 title: "2016 Election Tweets"
 author: Axl Ibiza, MBA
 output: html_notebook
+data_source_url: "https://www.kaggle.com/code/erikbruin/text-mining-the-clinton-and-trump-election-tweets/data?select=tweets.csv"
 ---
+In the following analysis, we examine Twitter data pertaining to campaign tweets from Hillary Clinton and Donald Trump during the 2016 election. First, word frequency analysis reveals the most common words used by each candidate, demonstrating their messaging focus. Next, we compare candidate word usage
+
+*    Word Frequency Analysis
+*    Comparison of Word Usage
+*    Changes in Word Use Analysis
+*    Favorites and Retweets Analysis
+
+## Tweet Frequency by Candidate
 
 ```{r}
 # init
@@ -11,6 +20,7 @@ library(lubridate)
 library(ggplot2)
 library(dplyr)
 library(readr)
+library(stringr)
 
 # read data
 tweets <- read.csv("tweets.csv")
@@ -30,5 +40,133 @@ tweets <- tweets %>%
 ggplot(tweets, aes(x = time, fill = candidate)) +
   geom_histogram(position = "identity", bins = 20, show.legend = FALSE) +
   facet_wrap(~candidate, ncol = 1) +
-  labs(title = "Tweet Counts by Candidate Over Time", x = "Time", y = "Number of Tweets") +
+  labs(title = "2016 Tweet Counts by Presidential Candidate", x = "Month", y = "Number of Tweets") +
   theme_minimal()
+```
+## Comparison of Word Usage
+
+To analyze changes in word use over time, we can group the tweets by month, then calculate the frequency of words for each period.
+
+```{r}
+# Preprocessing
+
+# Clean the text: remove URLs, mentions, and unnecessary characters
+tweets_cleaned <- tweets %>%
+  mutate(text = str_replace_all(text, "https?://\\S+|www\\.\\S+", "")) %>%  # Remove URLs
+  mutate(text = str_replace_all(text, "&amp;", "and")) %>%  # Replace HTML &amp;
+  mutate(text = str_replace_all(text, "[^[:alnum:]\\s]", "")) %>%  # Remove non-alphanumeric characters
+  mutate(text = tolower(text))  # Convert to lowercase
+
+# Tokenize the tweets: Convert each tweet into individual words
+tweets_tokenized <- tweets_cleaned %>%
+  unnest_tokens(word, text)  # Ensure the text column exists and is tokenized into the 'word' column
+
+# Ensure that tokenization worked by checking for the 'word' column
+print(head(tweets_tokenized))
+
+# Remove common stop words and candidate names (custom stop words)
+data("stop_words")
+custom_stop_words <- tibble(word = c("trump", "hillary", "donald", "clinton", "realdonaldtrump", "tco"))
+
+tweets_filtered <- tweets_tokenized %>%
+  anti_join(stop_words) %>%
+  anti_join(custom_stop_words)
+
+# Count word frequencies by candidate
+word_freq_by_candidate <- tweets_filtered %>%
+  group_by(candidate, word) %>%
+  count(sort = TRUE) %>%
+  ungroup()
+
+# Get the top 10 most common words for each candidate
+top_words_by_candidate <- word_freq_by_candidate %>%
+  group_by(candidate) %>%
+  top_n(10, n) %>%
+  ungroup()
+
+# Visualize the top 10 most common words for each candidate
+ggplot(top_words_by_candidate, aes(x = reorder(word, n), y = n, fill = candidate)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~candidate, scales = "free_y") +
+  coord_flip() +
+  labs(title = "Top 10 Most Common Words by Candidate",
+       x = "Words",
+       y = "Frequency") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+```
+## Changes in Word Use Analysis
+
+```{r}
+# Create a new column for the time period (e.g., month)
+tweets_filtered <- tweets_filtered %>%
+  mutate(month = floor_date(time, "month"))  # Group by month
+
+# Count word frequencies by candidate and month
+word_freq_by_time <- tweets_filtered %>%
+  group_by(candidate, month, word) %>%
+  count(sort = TRUE) %>%
+  ungroup()
+
+# Get the top 5 most common words across all time for each candidate
+top_words_by_candidate <- word_freq_by_time %>%
+  group_by(candidate, word) %>%
+  summarise(total_count = sum(n)) %>%
+  top_n(5, total_count) %>%
+  select(candidate, word)
+
+# Filter the main dataset to include only the top words
+word_freq_top_words <- word_freq_by_time %>%
+  inner_join(top_words_by_candidate, by = c("candidate", "word"))
+
+# Visualize the changes in word use over time
+ggplot(word_freq_top_words, aes(x = month, y = n, color = word)) +
+  geom_line(size = 1) +
+  facet_wrap(~candidate, scales = "free_y", ncol=1) +
+  labs(title = "Changes in Word Use Over Time by Candidate",
+       x = "Month",
+       y = "Frequency",
+       color = "Word") +
+  theme_minimal()
+
+```
+## Favorites and Retweets Analysis
+
+```{r}
+# Select relevant columns: candidate, retweet_count, favorite_count, and time
+tweets_filtered <- tweets %>%
+  select(candidate, retweet_count, favorite_count, time)
+
+# Group by candidate and summarize total favorites and retweets
+summary_stats <- tweets_filtered %>%
+  group_by(candidate) %>%
+  summarise(
+    total_favorites = sum(favorite_count, na.rm = TRUE),
+    total_retweets = sum(retweet_count, na.rm = TRUE),
+    avg_favorites = mean(favorite_count, na.rm = TRUE),
+    avg_retweets = mean(retweet_count, na.rm = TRUE),
+    tweet_count = n()
+  )
+
+# Print the summary statistics
+print(summary_stats)
+
+# Plot the comparison of favorites and retweets over time
+ggplot(tweets_filtered, aes(x = time)) +
+  geom_line(aes(y = retweet_count, color = "Retweets"), size = 1, alpha = 0.7) +
+  geom_line(aes(y = favorite_count, color = "Favorites"), size = 1, alpha = 0.7) +
+  facet_wrap(~candidate, scales = "free_y") +
+  labs(title = "Favorites and Retweets Over Time by Candidate",
+       x = "Time",
+       y = "Count",
+       color = "Metric") +
+  theme_minimal()
+
+# If you'd like to analyze the correlation between favorites and retweets:
+correlation <- tweets_filtered %>%
+  summarise(correlation = cor(favorite_count, retweet_count, use = "complete.obs"))
+
+# Print the correlation
+print(correlation)
+```
