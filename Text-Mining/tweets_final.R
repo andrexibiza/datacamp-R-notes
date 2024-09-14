@@ -1,22 +1,7 @@
----
-title: "2016 Election Tweets"
-author: "Axl Ibiza"
-output: html_notebook
-data_source_url: "https://www.kaggle.com/code/erikbruin/text-mining-the-clinton-and-trump-election-tweets/data?select=tweets.csv"
----
+# 2016 Election Tweets / Axl Ibiza
+# 2024-09-14
+# code adapted from https://www.tidytextmining.com/twitter
 
-In the following analysis, we examine Twitter data pertaining to campaign tweets from Hillary Clinton and Donald Trump during the 2016 election. First, word frequency analysis reveals the most common words used by each candidate, demonstrating their messaging focus. Next, we compare candidate word usage shows the differences in the language used by the candidates and their distinct rhetorical strategies. Then, we examine the changes in top word use over time, highlighting shifting campaign priorities. Lastly, we analyze favorites and retweets, which demonstrates a measure of how well their messages resonated with the broader public.
-
-*    Word Frequency Analysis
-*    Comparison of Word Usage
-*    Changes in Word Use Analysis
-*    Favorites and Retweets Analysis
-
-## Tweet Frequency by Candidate
-
-The plot below shows the tweet frequency of Donald Trump and Hillary Clinton in 2016.
-
-```{r}
 # init
 library(broom)
 library(dplyr)
@@ -33,6 +18,18 @@ library(tidytext)
 tweets <- read.csv("tweets.csv")
 head(tweets)
 dim(tweets) # 6444  28
+colnames(tweets)
+# [1] "id"                      "handle"                  "text"                    "is_retweet"             
+# [5] "original_author"         "time"                    "in_reply_to_screen_name" "in_reply_to_status_id"  
+# [9] "in_reply_to_user_id"     "is_quote_status"         "lang"                    "retweet_count"          
+# [13] "favorite_count"          "longitude"               "latitude"                "place_id"               
+# [17] "place_full_name"         "place_name"              "place_type"              "place_country_code"     
+# [21] "place_country"           "place_contained_within"  "place_attributes"        "place_bounding_box"     
+# [25] "source_url"              "truncated"               "entities"                "extended_entities"      
+# [29] "candidate"              
+
+
+### 1) Tweet Frequency by Candidate
 
 # Convert the 'time' column to a datetime format
 tweets <- tweets %>%
@@ -40,22 +37,14 @@ tweets <- tweets %>%
 
 # Filter tweets by candidate
 tweets <- tweets %>%
-  filter(handle %in% c("HillaryClinton", "realDonaldTrump")) %>%
-  mutate(candidate = ifelse(handle == "HillaryClinton", "Clinton", "Trump"))
+    mutate(candidate = ifelse(handle == "HillaryClinton", "Clinton", "Trump"))
 
 # Create the plot
 ggplot(tweets, aes(x = time, fill = candidate)) +
   geom_histogram(position = "identity", bins = 20, show.legend = FALSE) +
   facet_wrap(~candidate, ncol = 1)
 
-```
-Trump maintained a  consistent tweet volume over the year, with minor spikes in the spring and fall. In contrast, Clinton's tweet activity surged starting in June, peaking in July and again in October, aligning with key campaign events like the Democratic National Convention and the final stretch before the election.
-
-This highlights Trump’s steady use of Twitter, while Clinton increased her presence as the election approached. In other words, Trump was active on Twitter long before the presidential campaign season began.
-
-## Word Frequency Analysis
-
-```{r}
+### 2) Word Frequency Analysis
 replace_reg <- "https://t.co/[A-Za-z\\d]+|http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https"
 unnest_reg <- "([^A-Za-z_\\d#@']|'(?![A-Za-z_\\d#@]))"
 
@@ -85,18 +74,7 @@ ggplot(frequency, aes(Clinton, Trump)) +
   scale_y_log10(labels = percent_format()) +
   geom_abline(color = "red")
 
-# code adapted from https://www.tidytextmining.com/twitter
-```
-
-## Comparison of Word Usage
-
-The chart illustrates the Top 10 Most Common Words used by Donald Trump and Hillary Clinton during the 2016 campaign for U.S. President.
-
-For Donald Trump, prominent words like `trump2016`, `makeamericagreatagain`, `people`, `america`, and `vote` reflect his campaign's focus on slogans and a nationalistic message. Notably, words such as `crooked` and `ted` point to specific attacks on political opponent Ted Cruz.
-
-Hillary Clinton's top words include `people`, `trumps`, `america`, `president`, `families`, and `women`. Her frequent mention of `president` and `potus` reflects her emphasis on leadership, while `families` and `women` emphasize her campaign's socially inclusive focus.
-
-```{r}
+### 3) Comparison of Word Usage
 word_ratios <- tidy_tweets %>%
   filter(!str_detect(word, "^@")) %>%
   count(word, candidate) %>%
@@ -108,11 +86,6 @@ word_ratios <- tidy_tweets %>%
   mutate(logratio = log(Trump / Clinton)) %>%
   arrange(desc(abs(logratio)))
 
-# code adapted from https://www.tidytextmining.com/twitter
-```
-
-Which words are most likely to be from either Trump or Clinton's accounts?
-```{r}
 word_ratios %>%
   group_by(logratio < 0) %>%
   slice_max(abs(logratio), n = 15) %>% 
@@ -124,11 +97,7 @@ word_ratios %>%
   ylab("log odds ratio (Trump/Clinton)") +
   scale_fill_discrete(name = "", labels = c("Trump", "Clinton"))
 
-# code adapted from https://www.tidytextmining.com/twitter
-```
-- Heavy Spanish language outreach
-
-```{r}
+# graph v2 with Spanish stopwords removed
 # Spanish stopwords
 spanish <- c("de", "en", "los", "el", "para", "ve", "es", "por", "la")
 
@@ -147,11 +116,7 @@ word_ratios_filtered %>%
   ylab("log odds ratio (Trump/Clinton)") +
   scale_fill_discrete(name = "", labels = c("Trump", "Clinton"))
 
-# code adapted from https://www.tidytextmining.com/twitter
-```
-## Changes in Word Use Analysis
-
-```{r}
+### 4) Changes in Word Use Analysis
 words_by_time <- tidy_tweets %>%
   filter(!str_detect(word, "^@")) %>%
   mutate(time_floor = floor_date(time, unit = "1 month")) %>%
@@ -164,12 +129,6 @@ words_by_time <- tidy_tweets %>%
   rename(count = n) %>%
   filter(word_total > 30)
 
-words_by_time
-
-# code adapted from https://www.tidytextmining.com/twitter
-```
-
-```{r}
 nested_data <- words_by_time %>%
   nest(data = c(-word, -candidate)) 
 
@@ -197,10 +156,6 @@ words_by_time %>%
   geom_line(size = 1.3) +
   labs(x = NULL, y = "Word frequency")
 
-# code adapted from https://www.tidytextmining.com/twitter
-```
-
-```{r}
 words_by_time %>%
   inner_join(top_slopes, by = c("word", "candidate")) %>%
   filter(candidate == "Clinton") %>%
@@ -212,8 +167,72 @@ words_by_time %>%
   geom_line(size = 1.3) +
   labs(x = NULL, y = "Word frequency")
 
-# code adapted from https://www.tidytextmining.com/twitter
-```
+### 5) Favorites and Retweets Analysis
+tweets <- read.csv("tweets.csv") %>% 
+  mutate(time = ymd_hms(time)) %>% 
+  mutate(candidate = ifelse(handle == "HillaryClinton", "Clinton", "Trump"))  
+#dim(tweets)
+
+tidy_tweets <- tweets %>% 
+  filter(!str_detect(text, "^(RT|@)")) %>%
+  mutate(text = str_replace_all(text, replace_reg, "")) %>%
+  unnest_tokens(word, text, token = "regex", pattern = unnest_reg) %>%
+  filter(!word %in% stop_words$word,
+         !word %in% str_remove_all(stop_words$word, "'"))
+
+#dim(tidy_tweets)
+
+totals <- tidy_tweets %>% 
+  group_by(candidate, id) %>% 
+  summarise(rts = first(retweet_count)) %>% 
+  group_by(candidate) %>% 
+  summarise(total_rts = sum(rts))
+#totals
+
+word_by_rts <- tidy_tweets %>% 
+  group_by(id, word, candidate) %>% 
+  summarise(rts = first(retweet_count)) %>% 
+  group_by(candidate, word) %>% 
+  summarise(retweets = median(rts), uses = n()) %>%
+  left_join(totals) %>%
+  filter(retweets != 0) %>%
+  ungroup()
+
+word_by_rts %>% 
+  filter(uses >= 5) %>%
+  arrange(desc(retweets))
+
+word_by_rts %>%
+  filter(uses >= 5) %>%
+  group_by(candidate) %>%
+  slice_max(retweets, n = 10) %>% 
+  arrange(retweets) %>%
+  ungroup() %>%
+  mutate(word = factor(word, unique(word))) %>%
+  ungroup() %>%
+  ggplot(aes(word, retweets, fill = candidate)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ candidate, scales = "free", ncol = 2) +
+  coord_flip() +
+  labs(x = NULL, 
+       y = "Median # of retweets for tweets containing each word")
+
+
+
+word_by_rts %>%
+  filter(uses >= 5) %>%
+  group_by(candidate) %>%
+  slice_max(retweets, n = 10) %>% 
+  arrange(retweets) %>%
+  ungroup() %>%
+  mutate(word = factor(word, unique(word))) %>%
+  ungroup() %>%
+  ggplot(aes(word, retweets, fill = candidate)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ candidate, scales = "free", ncol = 2) +
+  coord_flip() +
+  labs(x = NULL, 
+       y = "Median # of retweets for tweets containing each word")
 
 
 
