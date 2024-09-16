@@ -5,12 +5,9 @@ output: html_notebook
 data_source_url: "https://www.kaggle.com/code/erikbruin/text-mining-the-clinton-and-trump-election-tweets/data?select=tweets.csv"
 ---
 
-In the following analysis, we examine Twitter data pertaining to campaign tweets from Hillary Clinton and Donald Trump during the 2016 election. First, word frequency analysis reveals the most common words used by each candidate, demonstrating their messaging focus. Next, we compare candidate word usage shows the differences in the language used by the candidates and their distinct rhetorical strategies. Then, we examine the changes in top word use over time, highlighting shifting campaign priorities. Lastly, we analyze favorites and retweets, which demonstrates a measure of how well their messages resonated with the broader public.
+In the following analysis, we examine Twitter data pertaining to campaign tweets from Hillary Clinton and Donald Trump during the 2016 election. First, examining tweet frequency by candidate shows their general use pattern. Next, word frequency analysis reveals the most common words used by each candidate, demonstrating their messaging focus. Next, we compare candidate word usage shows the differences in the language used by the candidates and their distinct rhetorical strategies. Then, we examine the changes in top word use over time, highlighting shifting campaign priorities. Lastly, we analyze favorites and retweets, which demonstrates a measure of how well their messages resonated with the broader public.
 
-*    Word Frequency Analysis
-*    Comparison of Word Usage
-*    Changes in Word Use Analysis
-*    Favorites and Retweets Analysis
+
 
 ## Tweet Frequency by Candidate
 
