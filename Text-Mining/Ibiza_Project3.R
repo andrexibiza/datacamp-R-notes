@@ -145,3 +145,61 @@ keyword_cors %>%
   geom_node_text(aes(label = name), repel = TRUE,
                  point.padding = unit(0.2, "lines")) +
   theme_void()
+
+### Calculating TF-IDF for descriptions
+desc_tf_idf <- nasa_desc %>% 
+  count(id, word, sort = TRUE) %>%
+  bind_tf_idf(word, id, n)
+
+# Highest TF-IDF words
+desc_tf_idf %>% 
+  arrange(-tf_idf)
+
+desc_tf_idf <- full_join(desc_tf_idf, nasa_keyword, by = "id")
+
+desc_tf_idf %>% 
+  filter(!near(tf, 1)) %>%
+  filter(keyword %in% c("EARTH SCIENCE", "ATMOSPHERE", 
+                        "SEISMOLOGY", "CLIMATE",
+                        "GEOGRAPHY", "ATMOSPHERIC SCIENCE")) %>%
+  arrange(desc(tf_idf)) %>%
+  group_by(keyword) %>%
+  distinct(word, keyword, .keep_all = TRUE) %>%
+  slice_max(tf_idf, n = 15, with_ties = FALSE) %>% 
+  ungroup() %>%
+  mutate(word = factor(word, levels = rev(unique(word)))) %>%
+  ggplot(aes(tf_idf, word, fill = keyword)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~keyword, ncol = 3, scales = "free") +
+  labs(title = "Highest tf-idf words in NASA metadata description fields",
+       caption = "NASA metadata from https://data.nasa.gov/data.json",
+       x = "tf-idf", y = NULL)
+
+### Topic Modeling
+
+# Casting to a Document-Term Matrix
+my_stop_words <- bind_rows(stop_words, 
+                           tibble(word = c("nbsp", "amp", "gt", "lt",
+                                           "timesnewromanpsmt", "font",
+                                           "td", "li", "br", "tr", "quot",
+                                           "st", "img", "src", "strong",
+                                           "http", "file", "files",
+                                           as.character(1:12)), 
+                                  lexicon = rep("custom", 30)))
+
+word_counts <- nasa_desc %>%
+  anti_join(my_stop_words) %>%
+  count(id, word, sort = TRUE) %>%
+  ungroup()
+
+word_counts
+
+desc_dtm <- word_counts %>%
+  cast_dtm(id, word, n)
+
+desc_dtm
+
+# ready for topic modeling
+# be aware that running this model is time intensive
+desc_lda <- LDA(desc_dtm, k = 12, control = list(seed = 1234))
+desc_lda
