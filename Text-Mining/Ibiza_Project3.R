@@ -104,7 +104,7 @@ title_word_pairs %>%
 
 # Visualize description word pairs
 desc_word_pairs %>%
-  filter(n >= 5000) %>%
+  filter(n >= 2000) %>%
   graph_from_data_frame() %>%
   ggraph(layout = "fr") +
   geom_edge_link(aes(edge_alpha = n, edge_width = n), edge_colour = "darkred") +
@@ -203,3 +203,77 @@ desc_dtm
 # be aware that running this model is time intensive
 desc_lda <- LDA(desc_dtm, k = 12, control = list(seed = 1234))
 desc_lda
+
+# tidy the models
+tidy_lda_12 <- tidy(desc_lda)
+tidy_lda_12
+
+tidy_lda_24 <- tidy(desc_lda_24)
+tidy_lda_24
+
+# Top terms for each topic
+top_terms <- tidy_lda_12 %>%
+  group_by(topic) %>%
+  slice_max(beta, n = 10, with_ties = FALSE) %>%
+  ungroup() %>%
+  arrange(topic, -beta)
+
+top_terms
+
+# Visualize top terms by topic
+top_terms %>%
+  mutate(term = reorder_within(term, beta, topic)) %>%
+  group_by(topic, term) %>%    
+  arrange(desc(beta)) %>%  
+  ungroup() %>%
+  ggplot(aes(beta, term, fill = as.factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  scale_y_reordered() +
+  labs(title = "Top 10 terms in each LDA topic",
+       x = expression(beta), y = NULL) +
+  facet_wrap(~ topic, ncol = 4, scales = "free")
+
+# Examine probability that a document belongs in each topic
+lda_gamma <- tidy(desc_lda, matrix = "gamma")
+
+lda_gamma
+
+# Distribution of probabilities for all topics
+ggplot(lda_gamma, aes(gamma)) +
+  geom_histogram(alpha = 0.8) +
+  scale_y_log10() +
+  labs(title = "Distribution of probabilities for all topics",
+       y = "Number of documents", x = expression(gamma))
+
+# Distribution of probability for each topic
+ggplot(lda_gamma, aes(gamma, fill = as.factor(topic))) +
+  geom_histogram(alpha = 0.8, show.legend = FALSE) +
+  facet_wrap(~ topic, ncol = 4) +
+  scale_y_log10() +
+  labs(title = "Distribution of probability for each topic",
+       y = "Number of documents", x = expression(gamma))
+
+# Connecting topic models with keywords
+lda_gamma <- full_join(lda_gamma, nasa_keyword, by = c("document" = "id"))
+
+lda_gamma
+
+# Top keywords
+top_keywords <- lda_gamma %>% 
+  filter(gamma > 0.9) %>% 
+  count(topic, keyword, sort = TRUE)
+
+top_keywords
+
+# Top keywords for each topic
+top_keywords %>%
+  group_by(topic) %>%
+  slice_max(n, n = 5, with_ties = FALSE) %>%
+  ungroup %>%
+  mutate(keyword = reorder_within(keyword, n, topic)) %>%
+  ggplot(aes(n, keyword, fill = as.factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  labs(title = "Top keywords for each LDA topic",
+       x = "Number of documents", y = NULL) +
+  scale_y_reordered() +
+  facet_wrap(~ topic, ncol = 2, scales = "free")
