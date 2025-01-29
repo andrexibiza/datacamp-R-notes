@@ -19,7 +19,7 @@ sum(probabilities) #should sum to 1
 weights_discrete_prob_distribution <- data.frame(weights,probabilities)
 
 # Nice print out of discrete probability distribution
-# weights_discrete_prob_distribution %>% gt()
+weights_discrete_prob_distribution %>% gt()
 
 # Graph of discrete probability distribution
 ggplot(weights_discrete_prob_distribution, aes(x=weights, y=probabilities)) + 
@@ -61,7 +61,7 @@ binomial_probabilities <- round(dbinom(x,n,p),4)
 species_binomial_prob_distribution <- data.frame(x, binomial_probabilities) 
 
 #Nice print our of binomial probability distribution
-# species_binomial_prob_distribution %>% gt() 
+#species_binomial_prob_distribution %>% gt() 
 
 breaks <- c(0:n)
 ggplot(species_binomial_prob_distribution, aes(x, y=binomial_probabilities)) + 
