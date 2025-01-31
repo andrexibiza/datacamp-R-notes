@@ -1,29 +1,34 @@
 ---
 title: "DataCamp_Intermediate-Data-Visualization-with-ggplot2"
 output: html_notebook
-author: "Andrex Ibiza, MBA"
+student: "Andrex Ibiza, MBA"
 date: 2025-01-31
 ---
 
 # Chapter 1: Statistics
+
 A picture paints a thousand words, which is why R ggplot2 is such a powerful tool for graphical data analysis. In this chapter, you’ll progress from simply plotting data to applying a variety of statistical methods. These include a variety of linear models, descriptive and inferential statistics (mean, standard deviation and confidence intervals) and custom functions.
 
 ## Video 1.1: Stats with geoms
 
 ### ggplot2, course 2
-- Statistics
-- Coordinates
-- Facets
-- Data Visualization Best Practices
+
+-   Statistics
+-   Coordinates
+-   Facets
+-   Data Visualization Best Practices
 
 ### Statistics layer
-- Two categories of functions:
-    - Called from within a geom
-    - Called independently
-- `stats_`
 
-### `geom_` <-> `stat_`
+-   Two categories of functions:
+    -   Called from within a geom
+    -   Called independently
+-   `stats_`
+
+### `geom_` \<-\> `stat_`
+
 ```{r}
+library(tidyverse)
 p <- ggplot(iris, aes(x = Sepal.Width))
 p + geom_histogram()
 ```
@@ -32,21 +37,21 @@ p + geom_histogram()
 p <- ggplot(iris, aes(x = Sepal.Width))
 p + geom_histogram()
 p + geom_bar()
-
 ```
+
 ```{r}
 p <- ggplot(mtcars, aes(x = factor(cyl),  fill = factor(am)))
 p + geom_bar()
 p + stat_count()
 ```
-```markdown
-| `stat_` | `geom_` |
-| --- | --- |
-| `stat_bin` | `geom_histogram()`, `geom_freqpoly() |
-| `stat_count()` | `geom_bar()` |
-```
+
+| `stat_`        | `geom_`                               |
+|----------------|---------------------------------------|
+| `stat_bin`     | `geom_histogram()`, `geom_freqpoly()` |
+| `stat_count()` | `geom_bar()`                          |
 
 ### `stat_smooth()`
+
 ```{r}
 ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
   geom_point() +
@@ -54,7 +59,9 @@ ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
 
 # geom_smooth() using method = 'loess' and formula 'y ~ x'
 ```
+
 ### `stat_smooth(se = FALSE)`
+
 ```{r}
 ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
   geom_point() +
@@ -64,6 +71,7 @@ ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
 ```
 
 ### `geom_smooth(span = 0.4)`
+
 ```{r}
 ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
   geom_point() +
@@ -73,6 +81,7 @@ ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
 ```
 
 ### `geom_smooth(method = "lm")`
+
 ```{r}
 ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
   geom_point() +
@@ -80,6 +89,7 @@ ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
 ```
 
 ### `geom_smooth(fullrange = TRUE)`
+
 ```{r}
 ggplot(iris, aes(x = Sepal.Length,
                  y = Sepal.Width,
@@ -88,67 +98,61 @@ ggplot(iris, aes(x = Sepal.Length,
   geom_smooth(method = "lm", 
               fullrange = TRUE)
 ```
-```markdown
+
 | `stat_` | `geom_` |
-| --- | --- |
-| `stat_bin` | `geom_histogram()`, `geom_freqpoly() |
-| `stat_count()` | `geom_bar()` |
-| `stat_smooth()` | `geom_smooth()` |
-```
+|------------------------------------|------------------------------------|
+| `stat_bin` | `geom_histogram()`, `geom_freqpoly() | |`stat_count()`|`geom_bar()`| |`stat_smooth()`|`geom_smooth()\` |
+
 ### Other `stat_` functions
-```markdown
-| `stat_` | `geom_` |
-| --- | --- |
-| `stat_boxplot()` | `geom_boxplot()` |
-| `stat_bindot()` | `geom_dotplot()` |
-| `stat_bin2d()` | `geom_bin2d()` |
-| `stat_binhex()` | `geom_hex()` |
-| `stat_contour()` | `geom_contour()` |
+
+| `stat_`           | `geom_`           |
+|-------------------|-------------------|
+| `stat_boxplot()`  | `geom_boxplot()`  |
+| `stat_bindot()`   | `geom_dotplot()`  |
+| `stat_bin2d()`    | `geom_bin2d()`    |
+| `stat_binhex()`   | `geom_hex()`      |
+| `stat_contour()`  | `geom_contour()`  |
 | `stat_quantile()` | `geom_quantile()` |
-| `stat_sum()` | `geom_count()` |
-```
+| `stat_sum()`      | `geom_count()`    |
 
 ## Video 1.2: Stats: sum and quantile
 
 ### Recall from course 1
-```markdown
-| | Cause of Over-plotting | Solutions |
-| --- | --- | --- |
+
+|   | Cause of Over-plotting | Solutions |
+|----|----------------------------------|----------------------------------|
 | 1 | Large datasets | Alpha-blending, hollow circles, and point size |
 | 2 | Aligned values on a single axis | As above, plus change position |
 | 3 | Low-precision data | Position: jitter |
 | 4 | Integer data | Position: jitter |
-```
 
 ### Plot counts to overcome over-plotting
-```markdown
-| | Cause of Over-plotting | Solutions | Here |
-| --- | --- | --- | --- |
-| 1 | Large datasets | Alpha-blending, hollow circles, and point size |
-| 2 | Aligned values on a single axis | As above, plus change position |
+
+|   | Cause of Over-plotting | Solutions | Here |
+|----|------------------|------------------|------------------|
+| 1 | Large datasets | Alpha-blending, hollow circles, and point size |  |
+| 2 | Aligned values on a single axis | As above, plus change position |  |
 | 3 | Low-precision data | Position: jitter | `geom_count()` |
 | 4 | Integer data | Position: jitter | `geom_count()` |
-```
 
 ### Low precision (& integer) data
+
 ```{r}
 p <- ggplot(iris, aes(Sepal.Length, Sepal.Width))
 p + geom_point() + ggtitle("Low precision (& integer) data")
 ```
 
 ### Jittering may give a wrong impression
+
 ```{r}
 p + geom_jitter(alpha = 0.5,
                 width = 0.1,
                 height = 0.1) +
   ggtitle("Jittering may give a wrong impression")
 ```
+
 ### `geom_count()`
+
 ```{r}
 p + geom_count() + ggtitle("geom_count()")
 ```
-
-
-
-
-
