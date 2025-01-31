@@ -1133,7 +1133,9 @@ gm2007_full <- gapminder %>%
 
 dplyr::glimpse(gm2007_full)
 ```
+
 ### First exploratory plots - distributions
+
 ```{r}
 ggplot(gm2007_full, aes(x = lifeExp)) +
   geom_histogram()
@@ -1148,12 +1150,14 @@ ggplot(gm2007_full_arranged,
        aes(index, lifeExp)) +  
   geom_point()
 ```
+
 ```{r}
 ggplot(gm2007_full_arranged,         
        aes(index, lifeExp, col = continent)) +  
   geom_point()
 
 ```
+
 ```{r}
 dplyr::glimpse(gm2007_full_arranged) 
 gm2007_full_arranged %>% dplyr::select(-index)
@@ -1175,6 +1179,7 @@ ggplot(top_bottom, aes(x = lifeExp, y = reorder(country, lifeExp), color = lifeE
   labs(x = "Life Expectancy", y = "Country", color = "Life Expectancy") +
   theme_minimal()
 ```
+
 ```{r}
 ggplot(top_bottom, aes(x = lifeExp, y = reorder(country, lifeExp), color = lifeExp)) +
   geom_point(size = 3) +
@@ -1197,6 +1202,7 @@ ggplot(top_bottom, aes(x = lifeExp, y = reorder(country, lifeExp), color = lifeE
   theme(plot.title = element_text(size = 20, face = "bold")) +
   ggtitle("Add text labels to your plot")
 ```
+
 ```{r}
 ggplot(top_bottom, aes(x = lifeExp, y = reorder(country, lifeExp), color = lifeExp)) +
   geom_point(size = 3) +
@@ -1213,7 +1219,9 @@ ggplot(top_bottom, aes(x = lifeExp, y = reorder(country, lifeExp), color = lifeE
   ) +
   labs(title="Add useful titles and citations", subtitle = "Highest and lowest life expectancies, 2007")
 ```
+
 ### Add useful titles and citations
+
 ```{r}
 ggplot(top_bottom, aes(x = lifeExp, y = reorder(country, lifeExp), color = lifeExp)) +
   geom_point(size = 3) +
@@ -1234,15 +1242,5 @@ ggplot(top_bottom, aes(x = lifeExp, y = reorder(country, lifeExp), color = lifeE
     axis.title.x = element_blank()
   )
 ```
-```
 
-
-
-
-
-
-
-
-
-
-
+\`\`\`
