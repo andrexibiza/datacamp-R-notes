@@ -159,14 +159,12 @@ LOESS isn't great on very short sections of data; compare the pieces of linear r
 Amend the smooth LOESS stat to map color to a dummy variable, "All".
 ```{r}
 # Amend the plot
-ggplot(mtcars, aes(x = wt, y = mpg, color = cyl)) +
-  geom_point() +
-  # Map color to dummy variable "All"
-  stat_smooth(aes(color = "All"), se = FALSE) +
-  stat_smooth(method = "lm", se = FALSE)
+# ggplot(mtcars, aes(x = wt, y = mpg, color = cyl)) +
+#   geom_point() +
+#   # Map color to dummy variable "All"
+#   stat_smooth(aes(color = "All"), se = FALSE) +
+#   stat_smooth(method = "lm", se = FALSE)
 ```
-
-
 
 ### Smoothing
 Smoothing
@@ -500,6 +498,313 @@ p_wt_vs_fcyl_by_fam_jit +
 # Chapter 2: Coordinates
 
 ## Video 2.1: Coordinates
+
+### Coordinates layer
+* Controls plot dimensions
+* `coord_`
+    * e.g. `coord_cartesian()`, `coord_flip()`, `coord_polar()` 
+
+### Zooming in
+* We use `coord_cartesian()` to zoom in on a specific part of a plot.
+* `coord_cartesian(xlim = ...)`
+* `scale_x_continuous(limits = ...)`
+* `xlim(...)`
+* `ylim(...)`
+
+### Original plot
+```{r}
+iris.smooth <- ggplot(
+  iris,
+  aes(x = Sepal.Length,
+      y = Sepal.Width,
+      color = Species)
+) +
+  geom_point(alpha = 0.7) +
+  geom_smooth()
+
+iris.smooth
+```
+
+### `scale_x_continuous()`
+```{r}
+iris.smooth +
+  scale_x_continuous(limits = c(4.5, 5.5))
+```
+Important warning messages: 95 rows removed bc they were a smaller range than the data and were filtered out.
+
+
+### `xlim()`
+- A quick and dirty alternative is to call `xlim()` as a function itself.
+```{r}
+iris.smooth +
+  xlim(c(4.5, 5.5))
+```
+This has the same effect.
+
+### `coord_cartesian()`
+```{r}
+iris.smooth +
+  coord_cartesian(xlim = c(4.5, 5.5))
+```
+
+Don't recycle or hard code limits before seeing the actual data.
+
+### Aspect ratio
+- Height-to-width ratio
+- Watch out for deceiption!
+- No universal standard
+- Typically use 1:1 if data is on the same scale.
+
+### Sunspots
+```{r}
+library(zoo)
+sunspots.m <- data.frame(
+  year = index(sunspot.month),
+  value = reshape2::melt(sunspot.month)$value)
+
+ggplot(sunspots.m, aes(
+  x = year,
+  y = value
+)) +
+  geom_line() +
+  coord_fixed() # default to 1:1 aspect ratio
+```
+
+```{r}
+ggplot(sunspots.m, aes(x = year, y = value)) +
+  geom_line() +
+  coord_fixed(ratio = 0.055)
+```
+
+## Zooming In
+
+In the video, you saw different ways of using the coordinates layer to zoom in. In this exercise, we'll compare zooming by changing scales and by changing coordinates.
+
+The big difference is that the scale functions change the underlying dataset, which affects calculations made by computed geoms (like histograms or smooth trend lines), whereas coordinate functions make no changes to the dataset.
+
+A scatter plot using mtcars with a LOESS smoothed trend line is provided. Take a look at this before updating it.
+
+### Instructions 1/2
+50 XP
+Update the plot by adding (+) a continuous x scale with limits from 3 to 6. 
+Spoiler: this will cause a problem!
+
+```{r}
+# # Run the code, view the plot, then update it
+# ggplot(mtcars, aes(x = wt, y = hp, color = fam)) +
+#   geom_point() +
+#   geom_smooth() +
+#   # Add a continuous x scale from 3 to 6
+#   scale_x_continuous(limits = c(3, 6))
+```
+### 2/2
+Update the plot by adding a Cartesian coordinate system with x limits, xlim, from 3 to 6.
+
+```{r}
+ggplot(mtcars, aes(x = wt, y = hp, color = am)) +
+  geom_point() +
+  geom_smooth() +
+  # Add Cartesian coordinates with x limits from 3 to 6
+  coord_cartesian(xlim = c(3,6))
+```
+
+## Aspect ratio I: 1:1 ratios
+We can set the aspect ratio of a plot with coord_fixed(), which uses ratio = 1 as a default. A 1:1 aspect ratio is most appropriate when two continuous variables are on the same scale, as with the iris dataset.
+
+All variables are measured in centimeters, so it only makes sense that one unit on the plot should be the same physical distance on each axis. This gives a more truthful depiction of the relationship between the two variables since the aspect ratio can change the angle of our smoothing line. This would give an erroneous impression of the data. Of course the underlying linear models don't change, but our perception can be influenced by the angle drawn.
+
+A plot using the iris dataset, of sepal width vs. sepal length colored by species, is shown in the viewer.
+
+### Instructions
+100 XP
+Add a fixed coordinate layer to force a 1:1 aspect ratio.
+
+```{r}
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
+  geom_jitter() +
+  geom_smooth(method = "lm", se = FALSE) +
+  # Fix the coordinate ratio
+  coord_fixed()
+```
+## Expand and clip
+The `coord_*()` layer functions offer two useful arguments that work well together: `expand` and `clip`.
+
+`expand` sets a buffer margin around the plot, so data and axes don't overlap. Setting `expand` to `0` draws the axes to the limits of the data.
+`clip` decides whether plot elements that would lie outside the plot panel are displayed or ignored ("clipped").
+When done properly this can make a great visual effect! We'll use `theme_classic()` and modify the axis lines in this example.
+
+### Instructions 1/2
+50 XP
+1
+Add Cartesian coordinates with zero expansion, to remove all buffer margins on both the x and y axes.
+
+```{r}
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(size = 2) +
+  # Add Cartesian coordinates with zero expansion
+  coord_cartesian(expand = 0) +
+  theme_classic()
+```
+
+
+### 2/2
+Setting `expand` to `0` caused points at the edge of the plot panel to be cut off.
+
+Set the `clip` argument to "off" to prevent this.
+Remove the axis lines by setting the axis.line argument to `element_blank()` in the `theme()` layer function.
+```{r}
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(size = 2) +
+  # Turn clipping off
+  coord_cartesian(expand = 0, clip = "off") +
+  theme_classic() +
+  # Remove axis lines
+  theme(axis.line = element_blank())
+```
+## Video 2.2: Coordinates vs. scales
+- How to use the coordinate layer to perform transformations, and 
+- How that differs from using the scale functions. 
+
+### Plot the raw data
+```{r}
+ggplot(msleep, aes(x = bodywt, y = 1)) +
+  geom_jitter() +
+  scale_x_continuous(limits = c(0, 7000),
+                     breaks = seq(0, 7000, 1000))
+```
+### Transform the raw data
+```{r}
+ggplot(msleep, aes(log10(bodywt), y = 1)) +
+  geom_jitter() +
+  scale_x_continuous(limits = c(-3, 4),
+                     breaks = seq(-3, 4),
+  )
+```
+### Add `logtick` annotation
+```{r}
+ggplot(msleep, aes(log10(bodywt), y = 1)) +
+  geom_jitter() +
+  scale_x_continuous(limits = c(-3, 4),
+                     breaks = -3:4) +
+                     annotation_logticks(sides = "b") # highlights log transformation
+```
+Another solution is to have the data on a log scale and label it with the original body weight value. Two ways to do this.
+
+### Use `scale_*_log10()`
+```{r}
+ggplot(msleep, aes(bodywt, y = 1)) +
+  geom_jitter() +
+  scale_x_log10(limits = c(1e-03, 1e+04))
+```
+### Use `coord_trans()`
+```{r}
+ggplot(msleep, aes(bodywt, y = 1)) +
+  geom_jitter() +
+  coord_trans(x = "log10")
+```
+
+Using `coord_trans` and setting the x argument to `log10` results in the same plot as using `scale_x_log10`. The default labels are different, but the plot is the same. But, there are some fundamental differences under the hood when applying transformations.
+
+
+## Log-transforming scales
+
+Using `scale_y_log10()` and `scale_x_log10()` is equivalent to transforming our actual dataset before getting to `ggplot2`.
+
+Using `coord_trans()`, setting `x = "log10"` and/or `y = "log10"` arguments, transforms the data after statistics have been calculated. The plot will look the same as with using `scale_*_log10()`, but the scales will be different, meaning that we'll see the original values on our log10 transformed axes. This can be useful since log scales can be somewhat unintuitive.
+
+Let's see this in action with positively skewed data - the brain and body weight of 51 mammals from the msleep dataset.
+
+### Instructions 1/3
+Using the msleep dataset, plot the raw values of brainwt against bodywt values as a scatter plot.
+```{r}
+# Produce a scatter plot of brainwt vs. bodywt
+ggplot(msleep, aes(x = bodywt, y = brainwt)) +
+  geom_point() +
+  ggtitle("Raw Values")
+```
+
+
+
+### Instructions 2/3
+Add the scale_x_log10() and scale_y_log10() layers with default values to transform the data before plotting.
+```{r}
+# Add scale_*_*() functions
+ggplot(msleep, aes(bodywt, brainwt)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10() +
+  ggtitle("Scale_ functions")
+```
+
+
+### Instructions 3/3
+Use `coord_trans()` to apply a `"log10"` transformation to both the `x` and `y` scales.
+```{r}
+# Perform a log10 coordinate system transformation
+ggplot(msleep, aes(bodywt, brainwt)) +
+  geom_point() +
+  coord_trans(x = "log10", y = "log10")
+```
+
+## Adding stats to transformed scales
+
+In the last exercise, we saw the usefulness of the coord_trans() function, but be careful! Remember that statistics are calculated on the untransformed data. A linear model may end up looking not-so-linear after an axis transformation. Let's revisit the two plots from the previous exercise and compare their linear models.
+
+### Instructions 1/2
+Add `log10` transformed scales to the `x` and `y` axes.
+```{r}
+# Plot with a scale_*_*() function:
+ggplot(msleep, aes(bodywt, brainwt)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  # Add a log10 x scale
+  scale_x_log10() +
+  # Add a log10 y scale
+  scale_y_log10() +
+  ggtitle("Scale functions")
+```
+
+
+### 2/2
+Add a `log10` coordinate transformation for both the `x` and `y` axes.
+Do you notice the difference between the two plots?
+```{r}
+# Plot with transformed coordinates
+ggplot(msleep, aes(bodywt, brainwt)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  # Add a log10 coordinate transformation for x and y axes
+  coord_trans(x = "log10", y = "log10")
+```
+## Video 2.3: Double and flipped axes
+
+### Typical axis modifications
+- Aspect ratios (see video 1)
+    - Adjust for best perspective 
+- Transformation functions (e.g. log, see video 2)
+    - Adjust if original scale is inappropriate.
+- Double x or y axes
+    - Add raw and transformed values
+    - Actually, having a double x or y axis is strongly discouraged.
+    - One problem with presenting transformed values is that we are an additional step further removed from the raw data.
+- Flipped axes
+    - Change direction of dependencies
+    - Change geometry orientation
+
+### Flipping axes
+```{r}
+ggplot(iris, aes(x = Sepal.Length, 
+                 y = Sepal.Width,
+                 color = Species)) +
+  geom_point() +
+  geom_smooth(method = "lm", 
+              se = FALSE)
+```
+### `coord_flip()`
+
+
+
+
 
 
 
