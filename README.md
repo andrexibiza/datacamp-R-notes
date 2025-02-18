@@ -1,4 +1,4 @@
-# Andrex_Ibiza
+# Andrex Ibiza, MBA's Data Portfolio
 Last updated: 2025-02-18
 
 Welcome to Andrex Ibiza's data portfolio repository! This collection features a diverse set of data science, text mining, machine learning, and statistical analysis projects. The projects span academic coursework, Kaggle competitions, and research in multiple domains.
