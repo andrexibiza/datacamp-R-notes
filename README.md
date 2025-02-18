@@ -1,7 +1,7 @@
 # Andrex_Ibiza
 Last updated: 2025-02-18
 
-Welcome to Andrex Ibiza's data portfolio repository! This collection features a diverse set of data science, text mining, machine learning, and statistical analysis projects developed by Andrex Ibiza, MBA. The projects span academic coursework, Kaggle competitions, and research  in multiple domains.
+Welcome to Andrex Ibiza's data portfolio repository! This collection features a diverse set of data science, text mining, machine learning, and statistical analysis projects. The projects span academic coursework, Kaggle competitions, and research in multiple domains.
 
 This repository is not all-inclusive. More of my work may be found on/at:
 - [DataCamp Portfolio](https://www.datacamp.com/portfolio/andrexibiza)
