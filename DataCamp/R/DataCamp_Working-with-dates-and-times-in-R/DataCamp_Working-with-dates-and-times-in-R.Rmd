@@ -1,0 +1,77 @@
+---
+title: "Working with Dates and Times in R"
+output: html_notebook
+---
+
+# Chapter 1: Dates and Times in R
+
+## Video 1.1: Introduction to dates
+
+### Dates
+Different conventions in different places
+
+27th Feb 2013
+* NZ: 27/2/2013
+* USA: 2/27/2013
+
+### ISO 8601 YYYY-MM-DD
+* Values ordered from the largest to smallest unit of time.
+* Each has a fixed number of digits, must be padded with leading zeros.
+* Either, no separators for computers, or `-` in dates.
+* 1st of January 2011 -> 2011-01-01
+
+### Dates in R
+* Packages that import dates: `readr`, `anytime`.
+
+```{r}
+2003-02-27
+# interpreted as mathematical function
+```
+
+```{r}
+"2003-02-27"
+# interpreted as character string
+```
+
+```{r}
+str("2003-02-27")
+# interpreted as character string
+```
+```{r}
+as.Date("2003-02-27")
+```
+
+```{r}
+str(as.Date("2003-02-27"))
+```
+
+### Specifying dates
+```{r}
+# The date R 3.0.0 was released
+x <- "2013-04-03"
+
+# Examine structure of x
+str(x)
+```
+
+```{r}
+# Use as.Date() to interpret x as a date
+x_date <- as.Date(x)
+
+# Examine structure of x_date
+str(x_date)
+
+# Store April 10 2014 as a Date
+april_10_2014 <- as.Date("2014-04-10")
+```
+
+### Automatic import
+Sometimes you'll need to input a couple of dates by hand using `as.Date()` but it's much more common to have a column of dates in a data file.
+
+Some functions that read in data will automatically recognize and parse dates in a variety of formats. In particular the import functions, like `read_csv()`, in the readr package will recognize dates in a few common formats.
+
+There is also the `anytime()` function in the `anytime` package whose sole goal is to automatically parse strings as dates regardless of the format.
+
+##
+
+
