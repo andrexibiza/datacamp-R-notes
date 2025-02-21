@@ -1,6 +1,9 @@
 ---
 title: "Working with Dates and Times in R"
 output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 # Chapter 1: Dates and Times in R
@@ -8,20 +11,22 @@ output: html_notebook
 ## Video 1.1: Introduction to dates
 
 ### Dates
+
 Different conventions in different places
 
-27th Feb 2013
-* NZ: 27/2/2013
-* USA: 2/27/2013
+27th Feb 2013 \* NZ: 27/2/2013 \* USA: 2/27/2013
 
 ### ISO 8601 YYYY-MM-DD
-* Values ordered from the largest to smallest unit of time.
-* Each has a fixed number of digits, must be padded with leading zeros.
-* Either, no separators for computers, or `-` in dates.
-* 1st of January 2011 -> 2011-01-01
+
+-   Values ordered from the largest to smallest unit of time.
+-   Each has a fixed number of digits, must be padded with leading
+    zeros.
+-   Either, no separators for computers, or `-` in dates.
+-   1st of January 2011 -\> 2011-01-01
 
 ### Dates in R
-* Packages that import dates: `readr`, `anytime`.
+
+-   Packages that import dates: `readr`, `anytime`.
 
 ```{r}
 2003-02-27
@@ -37,6 +42,7 @@ Different conventions in different places
 str("2003-02-27")
 # interpreted as character string
 ```
+
 ```{r}
 as.Date("2003-02-27")
 ```
@@ -45,7 +51,17 @@ as.Date("2003-02-27")
 str(as.Date("2003-02-27"))
 ```
 
-### Specifying dates
+## Specifying dates
+
+As you saw in the video, R doesn't know something is a date unless you
+tell it. If you have a character string that represents a date in the
+ISO 8601 standard you can turn it into a Date using the as.Date()
+function. Just pass the character string (or a vector of character
+strings) as the first argument.
+
+In this exercise you'll convert a character string representation of a
+date to a Date object.
+
 ```{r}
 # The date R 3.0.0 was released
 x <- "2013-04-03"
@@ -65,12 +81,1090 @@ str(x_date)
 april_10_2014 <- as.Date("2014-04-10")
 ```
 
-### Automatic import
-Sometimes you'll need to input a couple of dates by hand using `as.Date()` but it's much more common to have a column of dates in a data file.
+## Automatic import
 
-Some functions that read in data will automatically recognize and parse dates in a variety of formats. In particular the import functions, like `read_csv()`, in the readr package will recognize dates in a few common formats.
+Sometimes you'll need to input a couple of dates by hand using
+`as.Date()` but it's much more common to have a column of dates in a
+data file.
 
-There is also the `anytime()` function in the `anytime` package whose sole goal is to automatically parse strings as dates regardless of the format.
+Some functions that read in data will automatically recognize and parse
+dates in a variety of formats. In particular the import functions, like
+`read_csv()`, in the `readr` package will recognize dates in a few
+common formats.
 
-##
+There is also the `anytime()` function in the `anytime` package whose
+sole goal is to automatically parse strings as dates regardless of the
+format.
 
+```{r}
+# Load the readr package
+library(readr)
+
+# Use read_csv() to import rversions.csv
+releases <- read_csv("rversions.csv")
+
+# Examine the structure of the date column
+str(releases$date)
+```
+
+```{r}
+# Load the anytime package
+library(anytime)
+
+# Various ways of writing Sep 10 2009
+sep_10_2009 <- c("September 10 2009", "2009-09-10", "10 Sep 2009", "09-10-2009")
+
+# Use anytime() to parse sep_10_2009
+anytime(sep_10_2009)
+```
+
+## Video 1.2: Why use dates?
+
+### Dates act like numbers
+
+`Date` objects are stored as days since `1970-01-01`.
+
+```{r}
+as.Date("2003-02-27") > as.Date("2002-02-27")
+```
+
+```{r}
+as.Date("2003-02-27") + 1
+```
+
+```{r}
+as.Date("2003-02-27") - as.Date("2002-02-27")
+```
+
+### Plotting with dates
+
+```{r}
+x <- c(as.Date("2003-02-27"),
+       as.Date("2003-03-27"),
+       as.Date("2003-04-27"))
+plot(x, 1:3)
+```
+
+```{r}
+library(ggplot2)
+ggplot() +
+  geom_point(aes(x = x, y = 1:3))
+```
+
+### R releases
+
+```{r}
+# previously imported from csv
+releases
+```
+
+## Plotting
+
+If you plot a Date on the axis of a plot, you expect the dates to be in
+calendar order, and that's exactly what happens with `plot()` or
+`ggplot()`.
+
+In this exercise you'll make some plots with the R version releases data
+from the previous exercises using `ggplot2`. There are two big
+differences when a Date is on an axis:
+
+1)  If you specify limits they must be `Date` objects.
+2)  To control the behavior of the scale you use the `scale_x_date()`
+    function.
+
+**Instructions** - Make a plot of releases over time by setting the x
+argument of the aes() function to the date column. - Zoom in to the
+period from 2010 to 2014 by specifying limits from "2010-01-01" to
+"2014-01-01". Notice these strings need to be wrapped in as.Date() to be
+interpreted as Date objects. - Adjust the axis labeling by specifying
+date_breaks of "10 years" and date_labels of "%Y".
+
+```{r}
+# library(ggplot2)
+
+# Set the x axis to the date column
+ggplot(releases, aes(x = date, y = type)) +
+  geom_line(aes(group = 1, color = factor(major)))
+```
+
+```{r}
+# Limit the axis to between 2010-01-01 and 2014-01-01
+ggplot(releases, aes(x = date, y = type)) +
+  geom_line(aes(group = 1, color = factor(major))) +
+  xlim(as.Date("2010-01-01"), as.Date("2014-01-01"))
+```
+
+```{r}
+# Specify breaks every ten years and labels with "%Y"
+ggplot(releases, aes(x = date, y = type)) +
+  geom_line(aes(group = 1, color = factor(major))) +
+  scale_x_date(date_breaks = "10 years", date_labels = "%Y")
+```
+
+## Arithmetic and logical operators
+
+Since `Date` objects are internally represented as the number of days
+since `1970-01-01` you can do basic math and comparisons with dates. You
+can compare dates with the usual logical operators (`<`, `==`, `>`
+etc.), find extremes with `min()` and `max()`, and even subtract two
+dates to find out the time between them.
+
+In this exercise you'll see how these operations work by exploring the
+last R release. You'll see `Sys.date()` in the code, it simply returns
+today's date.
+
+**Instructions** - Find the date of the most recent release by calling
+`max()` on the date column in `releases`. - Find the rows in releases
+that have the most recent date, by specifying the comparison
+`date == last_release_date` in `filter()`. - Print `last_release` to see
+which release this was. - Calculate how long it has been since the most
+recent release by subtracting `last_release_date` from `Sys.Date()`.
+
+```{r}
+# # Find the largest date
+# last_release_date <- max(releases$date)
+# 
+# # Filter row for last release
+# last_release <- filter(releases, date == last_release_date)
+# 
+# # Print last_release
+# last_release
+# 
+# # A tibble: 1 x 7
+#   major minor patch date       datetime            time     type 
+#   <int> <int> <int> <date>     <dttm>              <time>   <chr>
+# 1     3     4     1 2017-06-30 2017-06-30 07:04:11 07:04:11 patch
+
+# # How long since last release?
+# Sys.Date() - last_release_date
+# 
+# Time difference of 2792 days
+```
+
+## Video 1.3: What about times?
+
+### ISO 8601
+
+**HH:MM:SS** - Largest unit to smallest - Fixed digits - Hours: 00 --
+24 - Minutes: 00 -- 59 - Seconds: 00 -- 60 (60 only for leap seconds) -
+No separator or `:`
+
+### Datetimes in R
+
+-   Two objects types:
+    -   `POSIXlt`: list with named components
+    -   `POSIXct`: number of seconds since `1970-01-01 00:00:00`
+-   `POSIXct` will go in a data frame
+-   `as.POSIX.ct()` turns a string into a `POSIXct` object
+    -   any datetimes not in ISO 8601 need to be parsed specially.
+
+```{r}
+x <- as.POSIXct("1970-01-01 00:10:00")
+str(x)
+```
+
+### Timezones
+
+-   `"2013-02-27T18:00:00"` - 6pm local time
+-   `"2013-02-27T18:00:00Z"` - 6pm UTC
+-   `"2013-02-27T18:00:00-0800"` - 6pm in Oregon (PST)
+
+```{r}
+as.POSIXct("2013-02-27T18:00:00Z")
+```
+
+-   `UTC` is a coordinated international standard that does not observe
+    Daylight Savings.
+
+```{r}
+as.POSIXct("2013-02-27T18:00:00Z", tz = "UTC")
+```
+
+### Datetimes behave nicely too
+
+Once a `POSIXct` object, datetimes can be: - Compared - Subtracted -
+Plotted
+
+## Getting datetimes into R
+
+Just like dates without times, if you want R to recognize a string as a
+datetime you need to convert it, although now you use `as.POSIXct()`.
+`as.POSIXct()` expects strings to be in the format
+`YYYY-MM-DD HH:MM:SS`.
+
+The only tricky thing is that times will be interpreted in local time
+based on your machine's set up. You can check your timezone with
+`Sys.timezone()`. If you want the time to be interpreted in a different
+timezone, you just set the `tz` argument of `as.POSIXct()`. You'll learn
+more about time zones in Chapter 4.
+
+In this exercise you'll input a couple of datetimes by hand and then see
+that `read_csv()` also handles datetimes automatically in a lot of
+cases.
+
+**Instructions** - Use `as.POSIXct()` and an appropriate string to input
+the datetime corresponding to Oct 1st 2010 at 12:12:00. - Enter the same
+datetime again, but now specify the timezone as
+`"America/Los_Angeles"`. - Use `read_csv()` to read in `rversions.csv`
+again. - Examine the structure of the datetime column to verify
+`read_csv()` has correctly interpreted it as a datetime.
+
+```{r}
+# Use as.POSIXct to enter the datetime 
+as.POSIXct("2010-10-01 12:12:00")
+
+# Use as.POSIXct again but set the timezone to `"America/Los_Angeles"`
+as.POSIXct("2010-10-01 12:12:00", tz = "America/Los_Angeles")
+
+# Use read_csv to import rversions.csv
+releases <- read_csv("rversions.csv")
+
+# Examine structure of datetime column
+str(releases$datetime)
+```
+
+## Datetimes behave nicely too
+
+Just like `Date` objects, you can plot and do math with `POSIXct`
+objects.
+
+As an example, in this exercise you'll see how quickly people download
+new versions of R, by examining the download logs from the RStudio CRAN
+mirror.
+
+R 3.2.0 was released at "2015-04-16 07:13:33" so
+`cran-logs_2015-04-17.csv` contains a random sample of downloads on the
+16th, 17th and 18th.
+
+**Instructions**
+
+-   Use `read_csv()` to import `cran-logs_2015-04-17.csv`.
+-   Print `logs` to see the information we have on each download.
+-   Store the R 3.2.0 release time as a `POSIXct` object.
+-   Find out when the first request for 3.2.0 was made by filtering for
+    values in the `datetime` column that are greater than
+    `release_time`. Finally see how downloads increase by creating
+    histograms of download time for 3.2.0 and the previous version
+    3.1.3. We've provided most of the code, you just need to specify the
+    `x` aesthetic to be the `datetime` column.
+
+```{r}
+# Import "cran-logs_2015-04-17.csv" with read_csv()
+logs <- read_csv("cran-logs_2015-04-17.csv")
+
+# Print logs
+print(logs)
+```
+
+```{r}
+library(dplyr)
+# Store the release time as a POSIXct object
+release_time <- as.POSIXct("2015-04-16 07:13:33", tz = "UTC")
+
+# When is the first download of 3.2.0?
+logs %>% 
+  filter(datetime > release_time,
+    r_version == "3.2.0")
+
+# Examine histograms of downloads by version
+ggplot(logs, aes(x = datetime)) +
+  geom_histogram() +
+  geom_vline(aes(xintercept = as.numeric(release_time)))+
+  facet_wrap(~ r_version, ncol = 1)
+```
+
+## Video 1.4: Why `lubridate`?
+
+### `lubridate`
+
+-   Make working with dates and times in R easy!
+-   `tidyverse` pacage
+    -   Plays nicely with builtin datetime objects
+    -   Designed for humans not computers
+-   Plays nicely with other tidyverse packages
+-   Consistent behavior regardless of underlying object
+
+### Parsing a wide range of formats
+
+-   `lubridate` makes it easy to parse a character string into a
+    datetime object.
+-   Although R has built-in parsing functions:
+    -   `lubridate`'s functions are simpler to use,
+    -   more forgiving of different formats,
+    -   and even allow parsing of many formats in one vector.
+
+```{r}
+library(lubridate)
+ymd("2013-02-27")
+```
+
+```{r}
+dmy("27/2/13")
+```
+
+```{r}
+parse_date_time(c("Feb 27th, 2017", "27th Feb 2017"),
+                order = c("mdy", "dmy"))
+```
+
+### Manipulating datetimes
+
+```{r}
+# Extract components
+akl_daily <- read_csv("akl_weather_daily.csv")
+akl_daily <- akl_daily %>% 
+  mutate(
+    year = year(date),
+    yday = yday(date),
+    month = month(date, label = TRUE)
+  )
+```
+
+### Time spans
+
+-   `lubridate` also has special objects for handling time spans - the
+    time that passes between two data points.
+    -   learn how to use time spans to generate sequences of datetimes
+        and calculate the length of time intervals like the reign of the
+        kings and queens of England.
+
+### Other `lubridate` features
+
+-   Handling timezones
+-   Fast parsing of standard formats
+-   Outputting datetimes
+
+------------------------------------------------------------------------
+
+# Chapter 2: Parsing and Manipulating Dates and Times with `lubridate`
+
+## Video 2.1: Parsing dates with `lubridate`
+
+### `ymd()`
+
+-   27th of February 2013
+-   `ymd()` - year, then month, then day
+    -   does a good job handling dates that are in the right order, but
+        may not be exactly ISO 8601
+        -   ignores separators
+        -   units don't have to be numeric
+
+```{r}
+ymd("2013-02-27")
+```
+
+```{r}
+ymd("2013.02.27")
+```
+
+```{r}
+ymd("2013 Feb 27th")
+```
+
+### Friends of `ymd()`
+
+-   The function name specifies the expected format of the date.
+
+-   If you don't specify a timezone, `lubridate` will assume `UTC`.
+
+`ymd()`, `ydm()`, `mdy()`, `myd()`, `dmy()`, `dym()`
+
+```{r}
+dmy("27-02-2013")
+```
+
+```{r}
+mdy("02-27-2013")
+```
+
+```{r}
+dmy_hm("27-02-2013 12:12pm")
+```
+
+### `parse_date_time(x = ___, order = ___)`
+
+-   Also parses dates, but you specify the order in a separate argument.
+
+```{r}
+parse_date_time("27-02-2013", order = "dmy")
+```
+
+```{r}
+parse_date_time(c("27-02-2013", "2013 Feb 27th"), order = c("dmy", "ymd"))
+```
+
+### Formatting characters
+
+-   All of these on help page for `parse_date_time`
+
+| Character | Meaning                  |
+|-----------|--------------------------|
+| `d`       | numeric day of the month |
+| `m`       | month of the year        |
+| `y`       | year with century        |
+| `Y`       | year without century     |
+| `H`       | hours (00-23)            |
+| `M`       | minutes (00-59)          |
+| `S`       | seconds (00-59)          |
+| `a`       | abbreviated weekday      |
+| `A`       | full weekday             |
+| `b`       | abbreviated month name   |
+| `B`       | full month name          |
+| `I`       | hours (01-12)/12-hr      |
+| `p`       | AM/PM                    |
+| `z`       | timezone offset from UTC |
+
+## Selecting the right parsing function
+
+`lubridate` provides a set of functions for parsing dates of a known
+order. For example, `ymd()` will parse dates with year first, followed
+by month and then day. The parsing is flexible, for example, it will
+parse the `m` whether it is numeric (e.g. `9` or `09`), a full month
+name (e.g. `September`), or an abbreviated month name (e.g. `Sep`).
+
+All the functions with `y`, `m` and `d` in any order exist. If your
+dates have times as well, you can use the functions that start with
+`ymd`, `dmy`, `mdy` or `ydm` and are followed by any of `_h`, `_hm` or
+`_hms`.
+
+To see all the functions available look at `ymd()` for dates and
+`ymd_hms()` for datetimes.
+
+Here are some challenges. In each case we've provided a date, your job
+is to choose the correct function to parse it.
+
+**Instructions**
+
+For each date the ISO 8601 format is displayed as a comment after it, to
+help you check your work
+
+-   Choose the correct function to parse `x`.
+
+-   Choose the correct function to parse `y`.
+
+-   Choose the correct function to parse `z`.
+
+```{r}
+library(lubridate)
+
+# Parse x 
+x <- "2010 September 20th" # 2010-09-20
+ymd(x)
+
+# Parse y 
+y <- "02.01.2010"  # 2010-01-02
+dmy(y)
+
+# Parse z 
+z <- "Sep, 12th 2010 14:00"  # 2010-09-12T14:00
+mdy_hm(z)
+```
+
+## Specifying an order with `parse_date_time()`
+
+What about if you have something in a really weird order like `dym_msh`?
+There's no named function just for that order, but that is where
+`parse_date_time()` comes in. `parse_date_time()` takes an additional
+argument, `orders`, where you can specify the order of the components in
+the date.
+
+For example, to parse `"2010 September 20th"` you could say
+`parse_date_time("2010 September 20th", orders = "ymd")` and that would
+be equivalent to using the `ymd()` function from the previous exercise.
+
+One advantage of `parse_date_time()` is that you can use more format
+characters. For example, you can specify weekday names with `A`, `I` for
+12 hour time, am/pm indicators with `p` and many others. You can see a
+whole list on the help page `?parse_date_time`.
+
+Another big advantage is that you can specify a vector of orders, and
+that allows parsing of dates where multiple formats might be used.
+
+You'll try it out in this exercise.
+
+**Instructions**
+
+-   `x` is a trickier datetime. Use the clues in the instructions to
+    parse `x`.
+
+-   `two_orders` has two different orders, parse both by specifying the
+    order to be `c("mdy", "dmy")`.
+
+-   Parse `short_dates` with `orders = c("dOmY", "OmY", "Y")`. *What
+    happens to the dates that don't have months or days specified?*
+
+```{r}
+# Specify an order string to parse x
+x <- "Monday June 1st 2010 at 4pm"
+parse_date_time(x, orders = "AmdyIp")
+
+# Specify order to include both "mdy" and "dmy"
+two_orders <- c("October 7, 2001", "October 13, 2002", "April 13, 2003", 
+  "17 April 2005", "23 April 2017")
+parse_date_time(two_orders, orders = c("mdy", "dmy"))
+
+# Specify order to include "dOmY", "OmY" and "Y"
+short_dates <- c("11 December 1282", "May 1372", "1253")
+parse_date_time(short_dates, orders = c("dOmY", "OmY", "Y"))
+```
+
+## Video 2.2: Weather in Auckland
+
+### `make_date(year, month, day)`
+
+```{r}
+make_date(year = 2013, month = 2, day = 27)
+```
+
+`make_datetime(year, month, day, hour, minute, second)` for datetimes
+
+### `dplyr` review
+
+-   `mutate()` - add new columns
+-   `filter()` - subset rows
+-   `select()` - subset columns
+-   `arrange()` - reorder rows
+-   `summarize()` - summarize data
+-   `group_by()` - group data, useful in conjunction with `summarize()`
+
+### Pipe `%>%`
+
+```{r}
+# Without the pipe: nested functions
+summarise(group_by(filter(releases, major == 3), minor), n =  n())
+
+# With pipe: more linear
+releases %>%   
+  filter(major == 3) %>%   
+  group_by(minor) %>%   
+  summarise(n = n())
+
+```
+
+## **Import daily weather data**
+
+In practice you won't be parsing isolated dates and times, they'll be
+part of a larger dataset. Throughout the chapter after you've mastered a
+skill with a simpler example (the release times of R for example),
+you'll practice your `lubridate` skills in context by working with
+weather data from Auckland NZ.
+
+There are two data sets: `akl_weather_daily.csv` a set of once daily
+summaries for 10 years, and `akl_weather_hourly_2016.csv` observations
+every half hour for 2016. You'll import the daily data in this exercise
+and the hourly weather in the next exercise.
+
+You'll be using functions from `dplyr`, so if you are feeling rusty, you
+might want to review `filter()`, `select()` and `mutate()`.
+
+**Instructions**
+
+-   Import the daily data, `"akl_weather_daily.csv"` with `read_csv()`.
+
+-   Print `akl_daily_raw` to confirm the `date` column hasn't been
+    interpreted as a date. *Can you see why?*
+
+-   Using `mutate()` overwrite the column `date` with a parsed version
+    of `date`. You need to specify the parsing function. Hint: the first
+    date should be September 1.
+
+-   Print `akl_daily` to verify the `date` column is now a `Date`.
+
+-   Take a look at the data by plotting `date` on the x-axis and
+    `max_temp` of the y-axis.
+
+```{r}
+library(lubridate)
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+# Import CSV with read_csv()
+akl_daily_raw <- read_csv("akl_weather_daily.csv")
+
+# Print akl_daily_raw
+print(akl_daily_raw)
+
+# Parse date 
+akl_daily <- akl_daily_raw %>%
+  mutate(date = ymd(date))
+
+# Print akl_daily
+print(akl_daily)
+
+# Plot to check work
+ggplot(akl_daily, aes(x = date, y = max_temp)) +
+  geom_line() 
+```
+
+## **Import hourly weather data**
+
+The hourly data is a little different. The date information is spread
+over three columns `year`, `month` and `mday`, so you'll need to use
+`make_date()` to combine them.
+
+Then the time information is in a separate column again, `time`. It's
+quite common to find date and time split across different variables. One
+way to construct the datetimes is to paste the `date` and `time`
+together and then parse them. You'll do that in this exercise.
+
+**Instructions**
+
+-   Import the hourly data, `"akl_weather_hourly_2016.csv"` with
+    `read_csv()`, then print `akl_hourly_raw` to confirm the date is
+    spread over `year`, `month` and `mday`.
+
+-   Using `mutate()` create the column `date` with using `make_date()`.
+
+-   We've pasted together the `date` and `time` columns. Create
+    `datetime` by parsing the `datetime_string` column.
+
+-   Take a look at the `date`, `time` and `datetime` columns to verify
+    they match up.
+
+-   Take a look at the data by plotting `datetime` on the x-axis and
+    `temperature` of the y-axis.
+
+```{r}
+library(lubridate)
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+# Import "akl_weather_hourly_2016.csv"
+akl_hourly_raw <- read_csv("akl_weather_hourly_2016.csv")
+
+# Print akl_hourly_raw
+print(akl_hourly_raw)
+
+# Use make_date() to combine year, month and mday 
+akl_hourly  <- akl_hourly_raw  %>% 
+  mutate(date = make_date(year = year, month = month, day = mday))
+
+# Parse datetime_string 
+akl_hourly <- akl_hourly  %>% 
+  mutate(
+    datetime_string = paste(date, time, sep = "T"),
+    datetime = ymd_hms(datetime_string)
+  )
+
+# Print date, time and datetime columns of akl_hourly
+akl_hourly %>% select(date, time, datetime)
+
+# Plot to check work
+ggplot(akl_hourly, aes(x = datetime, y = temperature)) +
+  geom_line()
+```
+
+## Video 2.3: Extracting parts of a datetime
+
+Once you've got dates in R, you'll often find yourself pulling them
+apart again. Why? Because exploring patterns in time often involves
+summarizing at different levels of resolution, like grouping data into
+months or averaging over hours.
+
+### Extracting components
+
+-   `year()`
+-   `month()`
+-   `day()`
+
+```{r}
+x <- ymd("2013-02-23")
+year(x)
+```
+
+```{r}
+month(x)
+```
+
+```{r}
+day(x)
+```
+
+### Extracting parts of a `datetime`
+
+| Function   | Extracts                 |
+|------------|--------------------------|
+| `year()`   | year with century        |
+| `month()`  | month of the year (1-12) |
+| `day()`    | day of the month (1-31)  |
+| `hour()`   | hour (0-23)              |
+| `min()`    | minute (0-59)            |
+| `second()` | second (0-59)            |
+| `wday()`   | day of the week (1-7)    |
+| `tz()`     | timezone                 |
+| `yday()`   | day of the year (1-365)  |
+
+### Setting parts of a `datetime`
+
+```{r}
+x
+```
+
+```{r}
+year(x) <- 2017
+x
+```
+
+### Other useful functions
+
+| Function      | Extracts                         |
+|---------------|----------------------------------|
+| `leap_year()` | logical if year is a leap year   |
+| `am()`        | logical if time is AM            |
+| `pm()`        | logical if time is PM            |
+| `dst()`       | logical if daylight savings time |
+| `quarter()`   | quarter of the year (1-4)        |
+| `semester()`  | semester of the year (1-2)       |
+
+## **What can you extract?**
+
+As you saw in the video, components of a datetime can be extracted by
+`lubridate` functions with the same name like `year()`, `month()`,
+`day()`, `hour()`, `minute()` and `second()`. They all work the same way
+just pass in a datetime or vector of datetimes.
+
+There are also a few useful functions that return other aspects of a
+datetime like if it occurs in the morning `am()`, during daylight
+savings `dst()`, in a `leap_year()`, or which `quarter()` or
+`semester()` it occurs in.
+
+Try them out by exploring the release times of R versions using the data
+from Chapter 1.
+
+**Instructions**
+
+We've put `release_time`, the `datetime` column of the `releases`
+dataset from Chapter 1, in your workspace.
+
+-   Examine the `head()` of `release_time` to verify this is a vector of
+    datetimes.
+
+-   Extract the month from `release_time` and examine the first few with
+    `head()`.
+
+-   To see which months have most releases, extract the month then pipe
+    to `table()`.
+
+-   Repeat, to see which years have the most releases.
+
+-   Do releases happen in the morning (UTC)? Find out if the hour of a
+    release is less than `12` and summarise with `mean()`.
+
+-   Alternatively use `am()` to find out how often releases happen in
+    the morning.
+
+```{r}
+release_time <- releases$datetime
+
+# Examine the head() of release_time
+head(release_time)
+
+# Examine the head() of the months of release_time
+head(month(release_time))
+
+# Extract the month of releases 
+month(release_time) %>% table()
+
+# Extract the year of releases
+year(release_time) %>% table()
+
+# How often is the hour before 12 (noon)?
+mean(hour(release_time) < 12)
+
+# How often is the release in am?
+mean(am(release_time))
+```
+
+## **Adding useful labels**
+
+In the previous exercise you found the month of releases:
+
+```         
+head(month(release_time)) 
+```
+
+and received numeric months in return. Sometimes it's nicer (especially
+for plotting or tables) to have named months. Both the `month()` and
+`wday()` (day of the week) functions have additional arguments `label`
+and `abbr` to achieve just that. Set `label = TRUE` to have the output
+labelled with month (or weekday) names, and `abbr = FALSE` for those
+names to be written in full rather than **abbr**eviated.
+
+For example, try running:
+
+```         
+head(month(release_time, label = TRUE, abbr = FALSE)) 
+```
+
+Practice by examining the popular days of the week for R releases.
+
+**Instructions**
+
+`releases` is now a data frame with a column called `datetime` with the
+release time.
+
+-   First, see what `wday()` does without labeling, by calling it on the
+    `datetime` column of `releases` and tabulating the result. *Do you
+    know if `1` is Sunday or Monday?*
+
+-   Repeat above, but now use labels by specifying the `label` argument.
+    *Better, right?*
+
+-   Now store the labelled weekdays in a new column called `wday`.
+
+-   Create a barchart of releases by weekday, facetted by the type of
+    release.
+
+```{r}
+# library(ggplot2)
+
+# Use wday() to tabulate release by day of the week
+wday(releases$datetime) %>% table()
+
+# Add label = TRUE to make table more readable
+wday(releases$datetime, label = TRUE) %>% table()
+
+# Create column wday to hold labelled week days
+releases$wday <- wday(releases$datetime, label = TRUE)
+
+# Plot barchart of weekday by type of release
+ggplot(releases, aes(wday)) +
+  geom_bar() +
+  facet_wrap(~ type, ncol = 1, scale = "free_y")
+```
+
+## **Extracting for plotting**
+
+Extracting components from a datetime is particularly useful when
+exploring data. Earlier in the chapter you imported daily data for
+weather in Auckland, and created a time series plot of ten years of
+daily maximum temperature. While that plot gives you a good overview of
+the whole ten years, it's hard to see the annual pattern.
+
+In this exercise you'll use components of the dates to help explore the
+pattern of maximum temperature over the year. The first step is to
+create some new columns to hold the extracted pieces, then you'll use
+them in a couple of plots.
+
+## **Instructions**
+
+**100 XP**
+
+-   Use `mutate()` to create three new columns: `year`, `yday` and
+    `month` that respectively hold the same components of the `date`
+    column. Don't forget to label the months with their names.
+
+-   Create a plot of `yday` on the x-axis, `max_temp` of the y-axis
+    where lines are grouped by `year`. *Each year is a line on this
+    plot, with the x-axis running from Jan 1 to Dec 31.*
+
+-   To take an alternate look, create a [**ridgeline
+    plot**](https://blog.revolutionanalytics.com/2017/07/joyplots.html)(formerly
+    known as a joyplot) with `max_temp` on the x-axis, `month` on the
+    y-axis, using `geom_density_ridges()` from the `ggridges` package.
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(ggridges)
+
+# Add columns for year, yday and month
+akl_daily <- akl_daily %>%
+  mutate(
+    year = year(date),
+    yday = yday(date),
+    month = month(date, label = TRUE))
+
+# Plot max_temp by yday for all years
+ggplot(akl_daily, aes(x = yday, y = max_temp)) +
+  geom_line(aes(group = year), alpha = 0.5)
+
+# Examine distribution of max_temp by month
+ggplot(akl_daily, aes(x = max_temp, y = month, height = ..density..)) +
+  geom_density_ridges(stat = "density")
+```
+
+## **Extracting for filtering and summarizing**
+
+Another reason to extract components is to help with filtering
+observations or creating summaries. For example, if you are only
+interested in observations made on weekdays (i.e. not on weekends) you
+could extract the weekdays then filter out weekends, e.g.
+`wday(date) %in% 2:6`.
+
+In the last exercise you saw that January, February and March were great
+times to visit Auckland for warm temperatures, but will you need a
+raincoat?
+
+In this exercise you'll find out! You'll use the hourly data to
+calculate how many days in each month there was any rain during the day.
+
+**Instructions**
+
+-   Create new columns for the hour and month of the observation from
+    `datetime`. Make sure you label the month.
+
+-   Filter to just daytime observations, where the hour is greater than
+    or equal to `8` and less than or equal to `22`.
+
+-   Group the observations first by `month`, then by `date`, and
+    summarise by using `any()` on the `rainy` column. *This results in
+    one value per day*
+
+-   Summarise again by summing `any_rain`. *This results in one value
+    per month*
+
+```{r}
+# Create new columns hour, month and rainy
+akl_hourly <- akl_hourly %>%
+  mutate(
+    hour = hour(datetime),
+    month = month(datetime, label = TRUE),
+    rainy = weather == "Precipitation"
+  )
+
+# Filter for hours between 8am and 10pm (inclusive)
+akl_day <- akl_hourly %>% 
+  filter(hour >= 8, hour <= 22)
+
+# Summarise for each date if there is any rain
+rainy_days <- akl_day %>% 
+  group_by(month, date) %>%
+  summarise(
+    any_rain = any(rainy)
+  )
+
+# Summarise for each month, the number of days with rain
+rainy_days %>% 
+  summarise(
+    days_rainy = sum(any_rain)
+  )
+```
+
+## Video 2.4: Rounding datetimes
+
+### Rounding versus extracting
+
+-   Rounding a date will always result in another date object of the
+    same type.
+
+```{r}
+release_time <- releases$datetime
+head(release_time)
+```
+
+```{r}
+head(release_time) %>% 
+       hour()
+```
+
+```{r}
+head(release_time) %>% 
+  floor_date(unit = "hour")
+```
+
+### Rounding in `lubridate`
+
+-   `round_date()` = round to **nearest**
+-   `ceiling_date()` = round **up**
+-   `floor_date()` = round **down**
+-   Possible values of `unit`:
+    -   `"second"`
+    -   `"minute"`
+    -   `"hour"`
+    -   `"day"`
+    -   `"week"`
+    -   `"month"`
+    -   `"bimonth"`
+    -   `"quarter"`
+    -   `"halfyear"`
+    -   `"year"`
+    -   or multiples, e.g. `"2 years"`, `"5 minutes"`
+
+## **Practice rounding**
+
+As you saw in the video, `round_date()` rounds a date to the nearest
+value, `floor_date()` rounds down, and `ceiling_date()` rounds up.
+
+All three take a `unit` argument which specifies the resolution of
+rounding. You can specify `"second"`, `"minute"`, `"hour"`, `"day"`,
+`"week"`, `"month"`, `"bimonth"`, `"quarter"`, `"halfyear"`, or
+`"year"`. Or, you can specify any multiple of those units, e.g.
+`"5 years"`, `"3 minutes"` etc.
+
+Try them out with the release datetime of R 3.4.1.
+
+**Instructions**
+
+-   Choose the right function and units to round `r_3_4_1` down to the
+    nearest day.
+
+-   Choose the right function and units to round `r_3_4_1` to the
+    nearest 5 minutes.
+
+-   Choose the right function and units to round `r_3_4_1` up to the
+    nearest week.
+
+-   Find the time elapsed on the day of release at the time of release
+    by subtracting `r_3_4_1` rounded down to the day from `r_3_4_1`.
+
+```{r}
+r_3_4_1 <- ymd_hms("2016-05-03 07:13:28 UTC")
+
+# Round down to day
+floor_date(r_3_4_1, unit = "day")
+
+# Round to nearest 5 minutes
+round_date(r_3_4_1, unit = "5 minutes")
+
+# Round up to week 
+ceiling_date(r_3_4_1, unit = "week")
+
+# Subtract r_3_4_1 rounded down to day
+r_3_4_1 - floor_date(r_3_4_1, unit = "day")
+```
+
+## **Rounding with the weather data**
+
+When is rounding useful? In a lot of the same situations extracting date
+components is useful. The advantage of rounding over extracting is that
+it maintains the context of the unit. For example, extracting the hour
+gives you the hour the datetime occurred, but you lose the day that hour
+occurred on (unless you extract that too), on the other hand, rounding
+to the nearest hour maintains the day, month and year.
+
+As an example you'll explore how many observations per hour there really
+are in the hourly Auckland weather data.
+
+**Instructions**
+
+-   Create a new column called `day_hour` that is `datetime` rounded
+    down to the nearest hour.
+
+-   Use `count()` on `day_hour` to count how many observations there are
+    in each hour. *What looks like the most common value?*
+
+-   Extend the pipeline, so that after counting, you filter for
+    observations where `n` is not equal to `2`.
+
+```{r}
+# Create day_hour, datetime rounded down to hour
+akl_hourly <- akl_hourly %>%
+  mutate(
+    day_hour = floor_date(datetime, unit = "hour")
+  )
+
+# Count observations per hour  
+akl_hourly %>% 
+  count(day_hour) 
+
+# Find day_hours with n != 2  
+akl_hourly %>% 
+  count(day_hour) %>%
+  filter(n != 2) %>% 
+  arrange(desc(n))
+```
+
+# Chapter 3: Arithmetic with Days and Times
