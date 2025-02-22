@@ -1168,3 +1168,999 @@ akl_hourly %>%
 ```
 
 # Chapter 3: Arithmetic with Days and Times
+
+## Video 3.1: Taking differences of datetimes
+
+### Arithmetic for datetimes
+
+-   `datetime_1 - datetime2`: subtraction for time elapsed
+
+-   `datetime_1 + (2 * timespan)`: addition and multiplication for
+    generating new datetimes in the past or future.
+
+-   `timespan1`/`timespan2`: division for change of units
+
+### Subtraction of datetimes
+
+```{r}
+releases <- read_csv("rversions.csv")
+last_release <- filter(releases, date == max(date))
+```
+
+```{r}
+Sys.Date() - last_release$date
+```
+
+```{r}
+difftime(Sys.Date(), last_release$date)
+```
+
+-   `time1 - time2` is the same as `difftime(time1, time2)`
+
+### `difftime()`
+
+`units =` `"secs"`, `"mins"`, `"hours"`, `"days"`, or `"weeks"`
+
+```{r}
+difftime(Sys.Date(), last_release$date, units = "secs")
+```
+
+```{r}
+difftime(Sys.Date(), last_release$date, units = "weeks")
+
+```
+
+### `now()` and `today()`
+
+```{r}
+today()
+```
+
+```{r}
+str(today())
+```
+
+```{r}
+now()
+```
+
+```{r}
+str(now())
+```
+
+## **How long has it been?**
+
+To get finer control over a difference between datetimes use the `base`
+function `difftime()`. For example instead of `time1 - time2`, you use
+`difftime(time1, time2)`.
+
+`difftime()` takes an argument `units` which specifies the units for the
+difference. Your options are `"secs"`, `"mins"`, `"hours"`, `"days"`, or
+`"weeks"`.
+
+To practice you'll find the time since the first man stepped on the
+moon. You'll also see the `lubridate` functions `today()` and `now()`
+which when called with no arguments return the current date and time in
+your system's timezone.
+
+**Instructions**
+
+-   Apollo 11 landed on July 20, 1969. Use `difftime()` to find the
+    number of days between `today()` and `date_landing`.
+
+-   Neil Armstrong stepped onto the surface at 02:56:15 UTC. Use
+    `difftime()` to find the number of seconds between `now()` and
+    `moment_step`.
+
+```{r}
+# The date of landing and moment of step
+date_landing <- mdy("July 20, 1969")
+moment_step <- mdy_hms("July 20, 1969, 02:56:15", tz = "UTC")
+
+# How many days since the first man on the moon?
+difftime(today(), date_landing, units = "days")
+
+# How many seconds since the first man on the moon?
+difftime(now(), moment_step, units = "secs")
+```
+
+## **How many seconds are in a day?**
+
+How many seconds are in a day? There are 24 hours in a day, 60 minutes
+in an hour, and 60 seconds in a minute, so there should be `24*60*60` =
+`86400` seconds, right?
+
+Not always! In this exercise you'll see a counter example, can you
+figure out what is going on?
+
+**Instructions**
+
+We've put code to define three times in your script - noon on March
+11th, March 12th, and March 13th in 2017 in the US Pacific timezone.
+
+-   Find the difference in time between `mar_13` and `mar_12` in
+    seconds. *This should match your intuition*.
+
+-   Now, find the difference in time between `mar_12` and `mar_11` in
+    seconds. *Surprised?*
+
+```{r}
+# Three dates
+mar_11 <- ymd_hms("2017-03-11 12:00:00", 
+  tz = "America/Los_Angeles")
+mar_12 <- ymd_hms("2017-03-12 12:00:00", 
+  tz = "America/Los_Angeles")
+mar_13 <- ymd_hms("2017-03-13 12:00:00", 
+  tz = "America/Los_Angeles")
+
+# Difference between mar_13 and mar_12 in seconds
+difftime(mar_13, mar_12, units = "secs")
+
+# Difference between mar_12 and mar_11 in seconds
+difftime(mar_12, mar_11, units = "secs")
+```
+
+Why would a day only have 82800 seconds? At 2am on Mar 12th 2017,
+Daylight Savings started in the Pacific timezone. That means a whole
+hour of seconds gets skipped between noon on the 11th and noon on the
+12th.
+
+## Video 3.2: Time spans
+
+Time spans are hard because they don't have a constant meaning. You saw
+an example in the previous exercise. Even though we say two datetimes
+are a day apart, that doesn't mean they are exactly 86400 seconds apart.
+To do addition with datetimes and timespans you need to be specific
+about what you mean by a time span. For example, to add one day to a
+datetime, you need to define what you mean by "one day".
+
+### Time spans in `lubridate`
+
+| **period** | **Duration** |
+|---------------------------------|---------------------------------------|
+| Human concept of a time span | Stopwatch concept of a time span |
+| datetime + **period** of one day = same time on the next date | datetime + **duration** of one day = datetime + 86400 seconds = 24 hours later |
+| variable length | fixed number of seconds |
+
+### Creating a time span
+
+```{r}
+days()
+```
+
+```{r}
+days(x = 2)
+```
+
+```{r}
+ddays(2)
+```
+
+### Arithmetic with time spans
+
+```{r}
+2 * days()
+```
+
+```{r}
+days() + days()
+```
+
+```{r}
+ymd("2011-01-01") + days()
+```
+
+### Functions to create time spans
+
+| Time span | Duration     | Period      |
+|-----------|--------------|-------------|
+| Seconds   | `dseconds()` | `seconds()` |
+| Minutes   | `dminutes()` | `minutes()` |
+| Hours     | `dhours()`   | `hours()`   |
+| Days      | `ddays()`    | `days()`    |
+| Weeks     | `dweeks()`   | `weeks()`   |
+| Months    | \-           | `months()`  |
+| Years     | `dyears()`   | `years()`   |
+
+# **Adding or subtracting a time span to a datetime**
+
+A common use of time spans is to add or subtract them from a moment in
+time. For, example to calculate the time one day in the future from
+`mar_11` (from the previous exercises), you could do either of:
+
+```         
+mar_11 + days(1) mar_11 + ddays(1) 
+```
+
+Try them in the console, you get different results! But which one is the
+right one? It depends on your intent. If you want to account for the
+fact that time units, in this case days, have different lengths (i.e.
+due to daylight savings), you want a period `days()`. If you want the
+time 86400 seconds in the future you use a duration `ddays()`.
+
+In this exercise you'll add and subtract timespans from dates and
+datetimes.
+
+## **Instructions**
+
+**100 XP**
+
+-   It's Monday Aug 27th 2018 at 2pm and you want to remind yourself
+    this time next week to send an email. Add a period of one week to
+    `mon_2pm`.
+
+-   It's Tuesday Aug 28th 2018 at 9am and you are starting some code
+    that usually takes about 81 hours to run. When will it finish? Add a
+    duration of 81 hours to `tue_9am`.
+
+-   What were you doing five years ago? Subtract a period of 5 years
+    from `today()`.
+
+-   Subtract a duration of 5 years from `today()`. *Will this give a
+    different date?*
+
+```{r}
+# Add a period of one week to mon_2pm
+mon_2pm <- dmy_hm("27 Aug 2018 14:00")
+mon_2pm + weeks(1)
+
+# Add a duration of 81 hours to tue_9am
+tue_9am <- dmy_hm("28 Aug 2018 9:00")
+tue_9am + dhours(81)
+
+# Subtract a period of five years from today()
+today() - years(5)
+
+# Subtract a duration of five years from today()
+today() - dyears(5)
+```
+
+## **Arithmetic with timespans**
+
+You can add and subtract timespans to create different length timespans,
+and even multiply them by numbers. For example, to create a duration of
+three days and three hours you could do: `ddays(3) + dhours(3)`, or
+`3*ddays(1) + 3*dhours(1)` or even `3*(ddays(1) + dhours(1))`.
+
+There was an eclipse over North America on 2017-08-21 at 18:26:40. It's
+possible to predict the next eclipse with similar geometry by
+calculating the time and date one
+[**Saros**](https://eclipse.gsfc.nasa.gov/SEsaros/SEsaros.html) in the
+future. A Saros is a length of time that corresponds to 223 Synodic
+months, a Synodic month being the period of the Moon's phases, a
+duration of 29 days, 12 hours, 44 minutes and 3 seconds.
+
+Do just that in this exercise!
+
+**Instructions**
+
+-   Create a duration corresponding to one Synodic Month: 29 days, 12
+    hours, 44 minutes and 3 seconds.
+
+-   Create a duration corresponding to one Saros by multiplying
+    `synodic` by 223.
+
+-   Add `saros` to `eclipse_2017` to predict the next eclipse.
+
+```{r}
+# Time of North American Eclipse 2017
+eclipse_2017 <- ymd_hms("2017-08-21 18:26:40")
+
+# Duration of 29 days, 12 hours, 44 mins and 3 secs
+synodic <- ddays(29) + dhours(12) + dminutes(44) + dseconds(3)
+
+# 223 synodic months
+saros <- synodic * 223
+
+# Add saros to eclipse_2017
+eclipse_2017 + saros
+```
+
+## **Generating sequences of datetimes**
+
+By combining addition and multiplication with sequences you can generate
+sequences of datetimes. For example, you can generate a sequence of
+periods from 1 day up to 10 days with,
+
+```         
+1:10 * days(1) 
+```
+
+Then by adding this sequence to a specific datetime, you can construct a
+sequence of datetimes from 1 day up to 10 days into the future
+
+```         
+today() + 1:10 * days(1) 
+```
+
+You had a meeting this morning at 8am and you'd like to have that
+meeting at the same time and day every two weeks for a year. Generate
+the meeting times in this exercise.
+
+**Instructions**
+
+-   Create `today_8am()` by adding a period of 8 hours to `today()`
+
+-   Create a sequence of periods from one period of two weeks, up to 26
+    periods of two weeks.
+
+-   Add `every_two_weeks` to `today_8am`.
+
+```{r}
+# Add a period of 8 hours to today
+today_8am <- today() + hours(8)
+
+# Sequence of two weeks from 1 to 26
+every_two_weeks <- 1:26 * weeks(2)
+
+# Create datetime for every two weeks for a year
+today_8am + every_two_weeks
+```
+
+## **The tricky thing about months**
+
+What should `ymd("2018-01-31") + months(1)` return? Should it be 30, 31
+or 28 days in the future? Try it. In general `lubridate` returns the
+same *day of the month* in the next month, but since the 31st of
+February doesn't exist `lubridate` returns a missing value, `NA`.
+
+There are alternative addition and subtraction operators: `%m+%` and
+`%m-%` that have different behavior. Rather than returning an `NA` for a
+non-existent date, they roll back to the last existing date.
+
+You'll explore their behavior by trying to generate a sequence for the
+last day in every month this year.
+
+**Instructions**
+
+We've put `jan_31`, the date for January 31st this year in your
+workspace.
+
+-   Start by creating a sequence of 1 to 12 periods of 1 month.
+
+-   Add `month_seq` to `jan_31`. *Notice what happens to any month where
+    the 31st doesn't exist*
+
+-   Now add `month_seq` to `jan_31` using the `%m+%` operator.
+
+-   Try subtracting `month_seq` from `jan_31` using the `%m-%` operator.
+
+```{r}
+jan_31 <- as.Date("2025-01-31")
+
+# A sequence of 1 to 12 periods of 1 month
+month_seq <- 1:12 * months(1)
+
+# Add 1 to 12 months to jan_31
+jan_31 + month_seq
+
+# Replace + with %m+%
+jan_31 %m+% month_seq
+
+# Replace + with %m-%
+jan_31 %m-% month_seq
+```
+
+## Video 3.3: Intervals
+
+### Creating intervals
+
+`datetime1` `%--%` `datetime2`, or
+
+`interval(datetime1, datetime2)`
+
+```{r}
+dmy("5 January 1961") %--% dmy("30 January 1969")
+```
+
+```{r}
+interval(dmy("5 January 1961"), dmy("30 January 1969"))
+```
+
+### Operating on an interval
+
+```{r}
+beatles <- dmy("5 January 1961") %--% dmy("30 January 1969")
+int_start(beatles)
+```
+
+```{r}
+int_end(beatles)
+```
+
+```{r}
+int_length(beatles)
+```
+
+```{r}
+as.period(beatles)
+```
+
+```{r}
+as.duration(beatles)
+```
+
+### Comparing intervals
+
+```{r}
+hendrix_at_woodstock <- mdy("August 17 1969")
+```
+
+```{r}
+hendrix_at_woodstock %within% beatles
+```
+
+```{r}
+hendrix <- dmy("01 October 1966") %--% dmy("16 September 1970")
+```
+
+```{r}
+int_overlaps(beatles, hendrix)
+```
+
+### Which kind of time span?
+
+Use:
+
+-   **Intervals** when you have a *start* and an *end*
+
+-   **Periods** when you are interested in human units
+
+-   **Durations** if you are interested in seconds elapsed
+
+You can create an interval by using the operator `%--%` with two
+datetimes. For example `ymd("2001-01-01") %--% ymd("2001-12-31")`
+creates an interval for the year of 2001.
+
+Once you have an interval you can find out certain properties like its
+start, end and length with `int_start()`, `int_end()` and `int_length()`
+respectively.
+
+```{r}
+# monarchs dataset not available
+
+# # Print monarchs
+# print(monarchs)
+# 
+# # Create an interval for reign
+# monarchs <- monarchs %>%
+#   mutate(reign = from %--% to) 
+# 
+# # Find the length of reign, and arrange
+# monarchs %>%
+#   mutate(length = int_length(reign)) %>% 
+#   arrange(desc(length)) %>%
+#   select(name, length, dominion)
+```
+
+## **Comparing intervals and datetimes**
+
+A common task with intervals is to ask if a certain time is inside the
+interval or whether it overlaps with another interval.
+
+The operator `%within%` tests if the datetime (or interval) on the left
+hand side is within the interval of the right hand side. For example, if
+`y2001` is the interval covering the year 2001,
+
+```         
+y2001 <- ymd("2001-01-01") %--% ymd("2001-12-31") 
+```
+
+Then `ymd("2001-03-30") %within% y2001` will return `TRUE` and
+`ymd("2002-03-30") %within% y2001` will return `FALSE`.
+
+`int_overlaps()` performs a similar test, but will return true if two
+intervals overlap at all.
+
+Practice to find out which monarchs saw Halley's comet around 1066.
+
+**Instructions**
+
+We've put `halleys` a data set describing appearances of Halley's comet
+in your workspace.
+
+-   Print `halleys` to examine the date. `perihelion_date` is the date
+    the Comet is closest to the Sun. `start_date` and `end_date` are the
+    range of dates the comet is visible from Earth.
+
+-   Create a new column, `visible`, that is an interval from
+    `start_date` to `end_date`.
+
+-   You'll work with one appearance, extract the 14th row of `halleys.`
+
+-   Filter `monarchs` to those where `halleys_1066$perihelion_date` is
+    within `reign`.
+
+-   Filter `monarchs` to those where `halleys_1066$visible` overlaps
+    `reign`.
+
+```{r}
+# halleys dataset not available
+# Print halleys
+# halleys
+# 
+# # New column for interval from start to end date
+# halleys <- halleys %>% 
+#   mutate(visible = start_date %--% end_date)
+# 
+# # The visitation of 1066
+# halleys_1066 <- halleys[14, ] 
+# 
+# # Monarchs in power on perihelion date
+# monarchs %>% 
+#   filter(halleys_1066$perihelion_date %within% reign) %>%
+#   select(name, from, to, dominion)
+# 
+# # Monarchs whose reign overlaps visible time
+# monarchs %>% 
+#   filter(int_overlaps(halleys_1066$visible, reign)) %>%
+#   select(name, from, to, dominion)
+```
+
+## **Converting to durations and periods**
+
+Intervals are the most specific way to represent a span of time since
+they retain information about the exact start and end moments. They can
+be converted to periods and durations exactly: it's possible to
+calculate both the exact number of seconds elapsed between the start and
+end date, as well as the perceived change in clock time.
+
+To do so you use the `as.period()`, and `as.duration()` functions,
+parsing in an interval as the only argument.
+
+Try them out to get better representations of the length of the monarchs
+reigns.
+
+**Instructions**
+
+-   Create new columns for `duration` and `period` that convert `reign`
+    into the appropriate object.
+
+-   Examine the `name`, `duration` and `period` columns.
+
+```{r}
+# # monarchs dataset not available
+# # New columns for duration and period
+# monarchs <- monarchs %>%
+#   mutate(
+#     duration = as.duration(reign),
+#     period = as.period(reign)) 
+#     
+# # Examine results    
+# monarchs %>%
+#   select(name, duration, period)
+```
+
+# Chapter 4: Problems in Practice
+
+## Video 4.1: Time zones
+
+### IANA Timezones
+
+It may seem weird to use a region and city to label a timezone rather
+than just an offset, but remember *offsets might change through the year
+due to daylight savings*, and when, and if, daylight savings occurred
+might have changed through history. To convert one set of datetimes to
+another timezone requires a complete record of this history, and since
+that history often isn't country specific, or country borders have
+changed through time, a city is the easiest way to label it. This
+database of timezones is managed by **Internet Assigned Numbers
+Authority**, or **IANA**, the same organization that is also responsible
+for handing out blocks of IP addresses to Regional Internet Registries.
+The database was orginally compiled by Arthur David Olson, hence the
+name of the R function, `OlsonNames`.
+
+```{r}
+Sys.timezone()
+```
+
+```{r}
+head(OlsonNames())
+length(OlsonNames())
+```
+
+### Setting and extracting
+
+```{r}
+mar_11 <- ymd_hms("2017-03-11 12:00:00",
+                  tz = "America/Los_Angeles")
+```
+
+```{r}
+tz(mar_11)
+```
+
+### Manipulating timezones
+
+`force_tz()` - change the timezone without changing the clock time
+
+```{r}
+mar_11
+```
+
+```{r}
+force_tz(mar_11, tzone = "America/New_York")
+```
+
+`with_tz()` - view the same instant in a different timezone
+
+```{r}
+with_tz(mar_11, tzone = "America/New_York")
+```
+
+## **Setting the timezone**
+
+If you import a datetime and it has the wrong timezone, you can set it
+with `force_tz()`. Pass in the datetime as the first argument and the
+appropriate timezone to the `tzone` argument. Remember the timezone
+needs to be one from `OlsonNames()`.
+
+I wanted to watch New Zealand in the Women's World Cup Soccer games in
+2015, but the times listed on the [**FIFA
+website**](https://www.fifa.com/tournaments/womens/womensworldcup) were
+all in times local to the venues. In this exercise you'll help me set
+the timezones, then in the next exercise you'll help me figure out what
+time I needed to tune in to watch them.
+
+**Instructions**
+
+I've put the times as listed on the FIFA website for games 2 and 3 in
+the group stage for New Zealand in your code.
+
+-   Game 2 was played in Edmonton. Use `force_tz()` to set the timezone
+    of game 2 to `"America/Edmonton"`.
+
+-   Game 3 was played in Winnipeg. Use `force_tz()` to set the timezone
+    of game 3 to `"America/Winnipeg"`.
+
+-   Find out how long the team had to rest between the two games, by
+    using `as.period()` on the interval between `game2_local` and
+    `game3_local`.
+
+```{r}
+# Game2: CAN vs NZL in Edmonton
+game2 <- mdy_hm("June 11 2015 19:00")
+
+# Game3: CHN vs NZL in Winnipeg
+game3 <- mdy_hm("June 15 2015 18:30")
+
+# Set the timezone to "America/Edmonton"
+game2_local <- force_tz(game2, tzone = "America/Edmonton")
+game2_local
+
+# Set the timezone to "America/Winnipeg"
+game3_local <- force_tz(game3, tzone = "America/Winnipeg")
+game3_local
+
+# How long does the team have to rest?
+as.period(game2_local %--% game3_local)
+```
+
+## **Viewing in a timezone**
+
+To view a datetime in another timezone use `with_tz()`. The syntax of
+`with_tz()` is the same as `force_tz()`, passing a datetime and set the
+`tzone` argument to the desired timezone. Unlike `force_tz()`,
+`with_tz()` isn't changing the underlying moment of time, just how it is
+displayed.
+
+For example, the difference between `now()` displayed in the
+"America/Los_Angeles" timezone and "Pacific/Auckland" timezone is 0:
+
+```         
+now <- now() with_tz(now, "America/Los_Angeles") -    with_tz(now,  "Pacific/Auckland") 
+```
+
+Help me figure out when to tune into the games from the previous
+exercise.
+
+**Instructions**
+
+-   Most fans will tune in from New Zealand. Use `with_tz()` to display
+    `game2_local` in New Zealand time. New Zealand is in the
+    `"Pacific/Auckland"` timezone.
+
+-   I'll be in Corvallis, Oregon. Use `with_tz()` to display
+    `game2_local` my time. Corvallis is in the `"America/Los_Angeles"`
+    timezone.
+
+-   Finally, use `with_tz()` to display `game3_local` in New Zealand
+    time.
+
+```{r}
+# What time is game2_local in NZ?
+with_tz(game2_local, tzone = "Pacific/Auckland")
+
+# What time is game2_local in Corvallis, Oregon?
+with_tz(game2_local, tzone = "America/Los_Angeles")
+
+# What time is game3_local in NZ?
+with_tz(game3_local, tzone = "Pacific/Auckland")
+```
+
+## **Timezones in the weather data**
+
+Did you ever notice that in the hourly Auckland weather data there was
+another datetime column, `date_utc`? Take a look:
+
+```         
+tibble::glimpse(akl_hourly) 
+```
+
+The `datetime` column you created represented local time in Auckland,
+NZ. I suspect this additional column, `date_utc` represents the
+observation time in UTC (the name seems a big clue). But does it really?
+
+Use your new timezone skills to find out.
+
+**Instructions**
+
+**100 XP**
+
+The data is available in the `akl_hourly` data frame.
+
+-   What timezone are `datetime` and `date_utc` currently in? Examine
+    the head of the `datetime` and `date_utc` columns to find out.
+
+-   Fix `datetime` to have the timezone for `"Pacific/Auckland"`.
+
+-   Reexamine the head of the `datetime` column to check the times have
+    the same clocktime, but are now in the right timezone.
+
+-   Now tabulate up the difference between the `datetime` and `date_utc`
+    columns. *It should be zero if our hypothesis was correct*.
+
+```{r}
+# Examine datetime and date_utc columns
+head(akl_hourly$datetime)
+head(akl_hourly$date_utc)
+  
+# Force datetime to Pacific/Auckland
+akl_hourly <- akl_hourly %>%
+  mutate(
+    datetime = force_tz(datetime, tzone = "Pacific/Auckland"))
+
+# Reexamine datetime
+head(akl_hourly$datetime)
+  
+# Are datetime and date_utc the same moments
+table(akl_hourly$datetime - akl_hourly$date_utc)
+  
+```
+
+## **Times without dates**
+
+For this entire course, if you've ever had a time, it's always had an
+accompanying date, i.e. a datetime. But sometimes you just have a time
+without a date.
+
+If you find yourself in this situation, the `hms` package provides an
+`hms` class of object for holding times without dates, and the best
+place to start would be with `as.hms()`.
+
+In fact, you've already seen an object of the `hms` class, but I didn't
+point it out to you. Take a look in this exercise.
+
+**Instructions**
+
+**100 XP**
+
+-   Use `read_csv()` to read in `"akl_weather_hourly_2016.csv"`.
+    *`readr` knows about the `hms` class, so if it comes across
+    something that looks like a time it will use it.*
+
+-   In this case the `time` column has been parsed as a time without a
+    date. Take a look at the structure of the `time` column to verify it
+    has the class `hms`.
+
+-   `hms` objects print like times should. Take a look by examining the
+    head of the `time` column.
+
+-   You can use `hms` objects in plots too. Create a plot with `time` on
+    the x-axis, `temperature` on the y-axis, with lines grouped by
+    `date`.
+
+```{r}
+# Import auckland hourly data 
+akl_hourly <- read_csv("akl_weather_hourly_2016.csv")
+
+# Examine structure of time column
+str(akl_hourly$time)
+
+# Examine head of time column
+head(akl_hourly$time)
+
+# A plot using just time
+ggplot(akl_hourly, aes(x = time, y = temperature)) +
+  geom_line(aes(group = make_date(year, month, mday)), alpha = 0.2)
+```
+
+## Video 4.2: More on importing and exporting datetimes
+
+### Fast parsing
+
+`parse_date_time()` can be slow because it's designed to be forgiving
+and flexible.
+
+```{r}
+
+library(fasttime)
+
+fastPOSIXct("2003-02-27")
+```
+
+### `fast_strptime()`
+
+```{r}
+x <- "2001-02-27"
+parse_date_time(x, order = "ymd")
+```
+
+```{r}
+x <- "2001-02-27"
+fast_strptime(x, format = "%Y-%m-%d")
+```
+
+```{r}
+fast_strptime(x, format = "%y-%m-%d")
+```
+
+### Exporting datetimes
+
+```{# {r}
+# library(tidyverse)
+# 
+# akl_hourly %>% 
+#   select(datetime) %>% 
+#   write_csv("tmp.csv")
+```
+
+### Formatting datetimes
+
+```{r echo=TRUE}
+
+my_stamp <- stamp("Tuesday October 10 2017")
+
+# Multiple formats matched: "%A October %Om %y%d"(1), "%A %B %d %y%H"(1), "%A %B %y %d%H"(1), "%A %B %d %Y"(1), "%A October %m %y%d"(1), "%A October %H %M%S"(1), "Tuesday %Om %d %y%H"(1), "Tuesday %Om %y %d%H"(1), "Tuesday %Om %d %Y"(1), "Tuesday October %Om %y%d"(1), "Tuesday October %Om %Y"(1), "Tuesday %B %d %y%H"(1), "Tuesday %B %y %d%H"(1), "Tuesday %B %d %Y"(1), "Tuesday October %m %y%d"(1), "Tuesday October %m %Y"(1), "Tuesday October %H %M%S"(1), "%A %Om %d %y%H"(0), "%A %Om %y %d%H"(0), "%A %Om %d %Y"(0), "%A October %Om %Y"(0), "%A October %m %Y"(0)
+# Using: "%A %B %y %d%H"
+```
+
+```{r}
+my_stamp(ymd("2003-02-27"))
+# [1] "Thursday February 03 2700"
+```
+
+## **Fast parsing with fasttime**
+
+The `fasttime` package provides a single function `fastPOSIXct()`,
+designed to read in datetimes formatted according to ISO 8601. Because
+it only reads in one format, and doesn't have to guess a format, it is
+really fast!
+
+You'll see how fast in this exercise by comparing how fast it reads in
+the dates from the Auckland hourly weather data (over 17,000 dates) to
+`lubridate`s `ymd_hms()`.
+
+To compare run times you'll use the `microbenchmark()` function from the
+package of the same name. You pass in as many arguments as you want each
+being an expression to time.
+
+**Instructions**
+
+**100 XP**
+
+We've loaded the datetimes from the Auckland hourly data as strings into
+the vector `dates`.
+
+-   Examine the structure of `dates` to verify it is a string and in the
+    ISO 8601 format.
+
+-   Parse `dates` with `fasttime` and pipe to `str()` to verify
+    `fastPOSIXct` parses them correctly.
+
+-   Now to compare timing, call `microbenchmark` where the first
+    argument uses `ymd_hms()` to parse `dates` and the second uses
+    `fastPOSIXct()`.
+
+```{r}
+# library(microbenchmark)
+# library(fasttime)
+# 
+# dates <- akl_hourly$date_utc
+# 
+# # Examine structure of dates
+# str(dates)
+# 
+# # Use fastPOSIXct() to parse dates
+# fastPOSIXct(dates) %>% str()
+# 
+# # Compare speed of fastPOSIXct() to ymd_hms()
+# microbenchmark(
+#   ymd_hms = ymd_hms(dates),
+#   fasttime = fastPOSIXct(dates),
+#   times = 20)
+```
+
+## **Fast parsing with lubridate::fast_strptime**
+
+`lubridate` provides its own fast datetime parser: `fast_strptime()`.
+Instead of taking an `order` argument like `parse_date_time()` it takes
+a `format` argument and the format must comply with the `strptime()`
+style.
+
+As you saw in the video that means any character that represents a
+datetime component must be prefixed with a `%` and any non-whitespace
+characters must be explicitly included.
+
+Try parsing `dates` with `fast_strptime()` and then compare its speed to
+the other methods you've seen.
+
+**Instructions**
+
+`dates` is in your workspace again.
+
+-   Examine the head of `dates`. *What components are present? What
+    separators are used?*
+
+-   Parse `dates` with `fast_strptime()` by specifying the appropriate
+    format string.
+
+-   Compare the timing of `fast_strptime()` to `fasttime` and
+    `ymd_hms()`.
+
+```{r}
+# # Head of dates
+# head(dates)
+# 
+# # Parse dates with fast_strptime
+# fast_strptime(dates, 
+#     format = "%Y-%m-%dT%H:%M:%SZ") %>% str()
+# 
+# # Comparse speed to ymd_hms() and fasttime
+# microbenchmark(
+#   ymd_hms = ymd_hms(dates),
+#   fasttime = fastPOSIXct(dates),
+#   fast_strptime = fast_strptime(dates, 
+#     format = "%Y-%m-%dT%H:%M:%SZ"),
+#   times = 20)
+```
+
+## **Outputting pretty dates and times**
+
+An easy way to output dates is to use the `stamp()` function in
+`lubridate`. `stamp()` takes a string which should be an example of how
+the date should be formatted, and returns a function that can be used to
+format dates.
+
+In this exercise you'll practice outputting `today()` in a nice way.
+
+**Instructions**
+
+-   Create a `stamp()` based on the string `"Saturday, Jan 1, 2000"`.
+
+-   Print `date_stamp`. *Notice it is a function.*
+
+-   Pass `today()` to `date_stamp` to format today's date.
+
+-   Now output today's date in American style `MM/DD/YYYY`.
+
+-   Finally, use stamp based on the `finished` string I've put in your
+    workspace to format `today()`.
+
+```{r}
+# Create a stamp based on "Saturday, Jan 1, 2000"
+date_stamp <- stamp("Saturday, Jan 1, 2000")
+
+# Print date_stamp
+print(date_stamp)
+
+# Call date_stamp on today()
+date_stamp(today())
+
+# Create and call a stamp based on "12/31/1999"
+stamp("12/31/1999")(today())
+
+# Use string finished for stamp()
+# stamp(finished)(today())
+
+```
