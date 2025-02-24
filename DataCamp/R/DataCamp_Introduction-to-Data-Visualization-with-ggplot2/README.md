@@ -1,4 +1,16 @@
-# DataCamp Introduction to Data Visualization with ggplot2
+---
+title: "Introduction to Data Visualization with ggplot2"
+language: "R"
+publisher: "DataCamp"
+instructor: [Rick Scavetta](https://www.datacamp.com/instructors/scavetta)
+notes_author: [Andrex Ibiza, MBA](andrexibiza@gmail.com)
+course-link: https://app.datacamp.com/learn/courses/introduction-to-data-visualization-with-ggplot2
+certificate-of-accomplishment: https://www.datacamp.com/completed/statement-of-accomplishment/course/97195d9517eca4f4a0dd020e69e9de75304d706d
+date_completed: 2023-09-24
+last_updated: 2025-02-24
+---
+
+# DataCamp - Introduction to Data Visualization with ggplot2
 
 This repository contains notes and resources for the DataCamp Introduction to Data Visualization with ggplot2 course. The course is designed to introduce you to the basics of data visualization using the ggplot2 package in R, focusing on creating simple and effective visualizations.
 
@@ -21,29 +33,3 @@ These notes are intended for learners who are new to ggplot2 and data visualizat
 
 - Basic knowledge of R programming.
 - Familiarity with data manipulation in R.
-
-## Notes Author: 
-- **Andrex Ibiza, MBA**
-
-## Content Publisher: 
-- **DataCamp**
-
-## [Certificate of Accomplishment](https://www.datacamp.com/completed/statement-of-accomplishment/course/97195d9517eca4f4a0dd020e69e9de75304d706d)
-
-## [Course Link](https://app.datacamp.com/learn/courses/introduction-to-data-visualization-with-ggplot2)
-## Instructor 
-- [Rick Scavetta](https://www.datacamp.com/instructors/scavetta)
-
-## Date 
-- **2025-01-29**
-
-## Output
-- **html_notebook**
-
-## Contact
-
-For any questions or further information, please contact Andrex Ibiza via [LinkedIn](https://www.linkedin.com/in/andrexibiza/).
-
----
-
-Happy Learning! 

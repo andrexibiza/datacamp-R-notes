@@ -1,6 +1,16 @@
-# DataCamp Intermediate Data Visualization with ggplot2
+---
+title: "Intermediate Data Visualization with ggplot2"
+language: "R"
+publisher: "DataCamp"
+instructor: [Rick Scavetta](https://www.datacamp.com/instructors/scavetta)
+notes_author: [Andrex Ibiza, MBA](andrexibiza@gmail.com)
+course-link: https://app.datacamp.com/learn/courses/intermediate-data-visualization-with-ggplot2
+certificate-of-accomplishment: https://www.datacamp.com/completed/statement-of-accomplishment/course/2836dc56bf6243f48f33a20837ad8374cb88c312
+date_completed: 2025-02-11
+last_updated: 2025-02-24
+---
 
-This repository contains notes and resources for the DataCamp Intermediate Data Visualization with ggplot2 course. The course is designed to enhance your data visualization skills using the ggplot2 package in R, focusing on creating complex and informative visualizations.
+This folder contains notes and resources for the DataCamp Intermediate Data Visualization with ggplot2 course. The course is designed to enhance your data visualization skills using the ggplot2 package in R, focusing on creating complex and informative visualizations.
 
 ## Contents
 
@@ -22,27 +32,9 @@ These notes are intended for learners who have a basic understanding of ggplot2 
 - Basic knowledge of R programming and ggplot2.
 - Familiarity with data manipulation in R.
 
-## Notes Author: 
-- **Andrex Ibiza, MBA**
-
-## Content Publisher: 
-- **DataCamp**
-
-## [Certificate of Accomplishment](https://www.datacamp.com/completed/statement-of-accomplishment/course/2836dc56bf6243f48f33a20837ad8374cb88c312)
-## [Course Link](https://app.datacamp.com/learn/courses/intermediate-data-visualization-with-ggplot2)
-## Instructor 
-- [Rick Scavetta](https://www.datacamp.com/instructors/scavetta)
-
-## Date 
-- **2025-02-11**
-
-## Output
-- **html_notebook**
-
-## Contact
-
-For any questions or further information, please contact me at [andrexibiza@gmail.com], via GitHub Issues, or a pull request.
-
----
-
-Happy Learning!
+## Datasets Used
+- `lattice::barley`: Contains information about barley yields from different varieties and sites.
+- `carData::Vocab`: Contains information about vocabulary test scores for different groups of students.
+- `iris`: Contains information about iris flowers, including sepal length, sepal width, petal length, petal width, and species.
+- `msleep`: Contains information about mammal sleep patterns, including body weight, brain weight, and sleep time.
+- `mtcars`: Contains information about various car models, including miles per gallon (mpg), horsepower, and other attributes.
