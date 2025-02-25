@@ -1,0 +1,254 @@
+---
+title: "Introduction to Writing Functions in R"
+language: "R"
+publisher: "DataCamp"
+instructor: [Richie Cotton](https://www.datacamp.com/instructors/richie)
+notes_author: [Andrex Ibiza, MBA](andrexibiza@gmail.com)
+course-link: 
+certificate-of-accomplishment: 
+date_completed: 
+last_updated: 2025-02-24
+---
+
+# Chapter 1: How to write a function
+
+## Video 1.1: Why you should use functions
+
+### The arguments to `mean()`
+
+Mean has 3 arguments: - `x`: a numeric or datetime vector - `trim`: the proportion of outliers from each end to remove before calculating - `na.rm`: remove before calculating
+
+### Calling `mean()`
+
+-   Pass arguments by position:
+    -   `mean(numbers, 0.1, TRUE)`
+-   Pass arguments by name:
+    -   `mean(na.rm = TRUE, trim = 0.1, x = numbers)`
+-   Common arguments by position, rare arguments by name:
+    -   `mean(numbers, trim = 0.1, na.rm = TRUE)`
+
+### Benefits of writing functions
+
+-   Functions eliminate repetition from your code, which - can reduce your workload, and - help avoid errors.
+
+-   Functions also allow code reuse and sharing.
+
+## **Calling functions**
+
+One way to make your code more readable is to be careful about the order you pass arguments when you call functions, and whether you pass the arguments by position or by name.
+
+`gold_medals`, a numeric vector of the number of gold medals won by each country in the 2016 Summer Olympics, is provided.
+
+For convenience, the arguments of `median()` and `rank()` are displayed using `args()`. Setting `rank()`'s `na.last` argument to `"keep"` means "keep the rank of NA values as NA".
+
+Best practice for calling functions is to include them in the order shown by `args()`, and to only name rare arguments.
+
+**Instructions 1/2**
+
+-   [**1**](javascript:void(0))
+
+    *The final line calculates the median number of gold medals each country won.*
+
+    Rewrite the call to `median()`, following best practices.
+
+    ```{r}
+    # # Look at the gold medals data
+    # gold_medals
+    # 
+    # # Note the arguments to median()
+    # args(median)
+    # 
+    # # Rewrite this function call, following best practices
+    # median(gold_medals, na.rm = TRUE)
+    ```
+
+-   [**2**](javascript:void(0))
+
+    *The final line calculates each country's ranking by number of gold medals. It uses negative `gold_medals` so that the country with the most medals will have 1st place: the largest positive value in `gold_medals` is the smallest ("most negative") value in `-gold_medals`.*
+
+    ```{r}
+    # # Note the arguments to rank()
+    # args(rank)
+    # 
+    # # Rewrite this function call, following best practices
+    # rank(-gold_medals, na.last = "keep",ties.method = "min")
+    ```
+
+    Rewrite the call to `rank()`, following best practices.
+
+-   `args()` function used to check function arguments
+
+## Video 1.2: Converting scripts into functions
+
+-   A great workflow is to write a script, then convert any repeated chunks of code in that script into functions.
+
+### A basic function template
+
+```{r}
+# function_name <- function(arg1, arg2) { # the signature
+#   # Do something with arg1 and arg2     # the body
+#   return(something)
+# }
+```
+
+### 1) Make a template
+
+```{r}
+import_test_scores <- function() {
+  
+  
+  
+  
+}
+```
+
+### 2) Choose the arguments 
+
+-   Paste your script inside the braces
+
+```{r}
+import_test_scores <- function(filename) { # <- only 1 argument
+    test_scores_geography_raw <- read_csv("test_scores_geography.csv")  
+    test_scores_geography_clean <- test_scores_geography_raw %>%     
+      select(person_id, first_name, last_name, test_date, score) %>%    
+      mutate(test_date = mdy(test_date)) %>%    
+      filter(!is.na(score))  
+}
+```
+
+### 3) Replace specific values with arguments
+
+```{r}
+import_test_scores <- function(filename) { # <- only 1 argument
+    test_scores_geography_raw <- read_csv(filename) # <- replace specific filename  
+    test_scores_geography_clean <- raw_data %>%     
+      select(person_id, first_name, last_name, test_date, score) %>%    
+      mutate(test_date = mdy(test_date)) %>%    
+      filter(!is.na(score))  
+}
+```
+
+### 4) Generalize variable names
+
+```{r}
+import_test_scores <- function(filename) { 
+    test_scores_raw <- read_csv(filename) # <- variable names generalized
+    test_scores_clean <- test_scores_raw %>%     # <- variable names generalized
+      select(person_id, first_name, last_name, test_date, score) %>%    
+      mutate(test_date = mdy(test_date)) %>%    
+      filter(!is.na(score))  
+}
+```
+
+### 5) Remove the final assignment
+
+```{r}
+import_test_scores <- function(filename) {  
+  test_scores_raw <- read_csv(filename)  
+  
+  test_scores_raw %>%  # <- remove assignment    
+    select(person_id, first_name, last_name, test_date, score) %>%    
+    mutate(test_date = mdy(test_date)) %>%    
+    filter(!is.na(score))}
+
+```
+
+### 6) Use your function
+
+```{r}
+test_scores_geography <- import_test_scores("test_scores_geography.csv")
+test_scores_english <- import_test_scores("test_scores_english.csv")
+test_scores_art <- import_test_scores("test_scores_art.csv")
+test_scores_spanish <- import_test_scores("test_scores_spanish.csv")
+
+```
+
+## Video 1.3: Y kant I reed ur code?
+
+### `dplyr` verbs
+
+-   `select()` *selects* columns
+
+-   `filter()` *filters* rows
+
+### Function names should contain a verb
+
+-   get
+
+-   calculate (or just calc)
+
+-   run
+
+-   process
+
+-   import
+
+-   clean
+
+-   tidy
+
+-   draw
+
+### `lm()` is badly named
+
+-   Acronyms aren't self-explanatory
+
+-   It doesn't contain a verb
+
+-   There are lots of different linear models.
+
+A better name would be `run_linear_regression()`
+
+### Readability vs. Typeability
+
+-   Understanding code \>\> typing code
+
+-   Code editors have autocomplete
+
+-   You can alias common functions
+
+```{r}
+h <- head
+data(cats, package = "MASS")
+h(cats)
+```
+
+### Arguments of `lm()`
+
+```{r}
+args(lm)
+```
+
+### Types of argument
+
+-   **Data arguments**: what you compute on
+
+-   **Detail arguments**: how you perform the computation
+
+```{r}
+args(cor)
+```
+
+### Data args should precede detail args
+
+This won't work
+
+```         
+data %>% 
+  lm(formula)
+```
+
+because the data argument isn't first.
+
+### Our revised function for linear regression
+
+```{r}
+run_linear_regression <- function(data, formula) {
+  lm(formula, data)
+}
+```
+
+```{r}
+cats %>% 
+  run_linear_regression(Hwt ~ Bwt + Sex)
+```
