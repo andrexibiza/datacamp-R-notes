@@ -51,27 +51,27 @@ Best practice for calling functions is to include them in the order shown by `ar
 
     Rewrite the call to `median()`, following best practices.
 
-    ```{r}
-    # # Look at the gold medals data
-    # gold_medals
-    # 
-    # # Note the arguments to median()
-    # args(median)
-    # 
-    # # Rewrite this function call, following best practices
-    # median(gold_medals, na.rm = TRUE)
+    ```         
+    # Look at the gold medals data
+    gold_medals
+
+    # Note the arguments to median()
+    args(median)
+
+    # Rewrite this function call, following best practices
+    median(gold_medals, na.rm = TRUE)
     ```
 
 -   [**2**](javascript:void(0))
 
     *The final line calculates each country's ranking by number of gold medals. It uses negative `gold_medals` so that the country with the most medals will have 1st place: the largest positive value in `gold_medals` is the smallest ("most negative") value in `-gold_medals`.*
 
-    ```{r}
-    # # Note the arguments to rank()
-    # args(rank)
-    # 
-    # # Rewrite this function call, following best practices
-    # rank(-gold_medals, na.last = "keep",ties.method = "min")
+    ```         
+    # Note the arguments to rank()
+    args(rank)
+
+    # Rewrite this function call, following best practices
+    rank(-gold_medals, na.last = "keep",ties.method = "min")
     ```
 
     Rewrite the call to `rank()`, following best practices.
@@ -84,16 +84,16 @@ Best practice for calling functions is to include them in the order shown by `ar
 
 ### A basic function template
 
-```{r}
-# function_name <- function(arg1, arg2) { # the signature
-#   # Do something with arg1 and arg2     # the body
-#   return(something)
-# }
+```         
+function_name <- function(arg1, arg2) { # the signature
+  # Do something with arg1 and arg2     # the body
+  return(something)
+}
 ```
 
 ### 1) Make a template
 
-```{r}
+```         
 import_test_scores <- function() {
   
   
@@ -102,11 +102,11 @@ import_test_scores <- function() {
 }
 ```
 
-### 2) Choose the arguments 
+### 2) Choose the arguments
 
 -   Paste your script inside the braces
 
-```{r}
+```         
 import_test_scores <- function(filename) { # <- only 1 argument
     test_scores_geography_raw <- read_csv("test_scores_geography.csv")  
     test_scores_geography_clean <- test_scores_geography_raw %>%     
@@ -118,7 +118,7 @@ import_test_scores <- function(filename) { # <- only 1 argument
 
 ### 3) Replace specific values with arguments
 
-```{r}
+```         
 import_test_scores <- function(filename) { # <- only 1 argument
     test_scores_geography_raw <- read_csv(filename) # <- replace specific filename  
     test_scores_geography_clean <- raw_data %>%     
@@ -130,7 +130,7 @@ import_test_scores <- function(filename) { # <- only 1 argument
 
 ### 4) Generalize variable names
 
-```{r}
+```         
 import_test_scores <- function(filename) { 
     test_scores_raw <- read_csv(filename) # <- variable names generalized
     test_scores_clean <- test_scores_raw %>%     # <- variable names generalized
@@ -142,7 +142,7 @@ import_test_scores <- function(filename) {
 
 ### 5) Remove the final assignment
 
-```{r}
+```         
 import_test_scores <- function(filename) {  
   test_scores_raw <- read_csv(filename)  
   
@@ -150,17 +150,146 @@ import_test_scores <- function(filename) {
     select(person_id, first_name, last_name, test_date, score) %>%    
     mutate(test_date = mdy(test_date)) %>%    
     filter(!is.na(score))}
-
 ```
 
 ### 6) Use your function
 
-```{r}
+```         
 test_scores_geography <- import_test_scores("test_scores_geography.csv")
 test_scores_english <- import_test_scores("test_scores_english.csv")
 test_scores_art <- import_test_scores("test_scores_art.csv")
 test_scores_spanish <- import_test_scores("test_scores_spanish.csv")
+```
 
+## **Your first function: tossing a coin**
+
+Time to write your first function! It's a really good idea when writing functions to start simple. You can always make a function more complicated later if it's really necessary, so let's not worry about arguments for now.
+
+**Instructions 1/4**
+
+-   Simulate a single coin toss by using `sample()` to sample from `coin_sides` once.
+
+```{r}
+coin_sides <- c("head", "tail")
+
+# Sample from coin_sides once
+sample(coin_sides, 1)
+```
+
+**2/4**
+
+-   Write a template for your function, naming it `toss_coin`. The function should take no arguments. Don't include the body of the function yet.
+
+```         
+toss_coin <- function () {
+
+}
+```
+
+**3/4**
+
+-   Copy your script, and paste it into the function body.
+
+```{r}
+# Your script, from a previous step
+coin_sides <- c("head", "tail")
+sample(coin_sides, 1)
+
+# Paste your script into the function body
+toss_coin <- function() {
+  coin_sides <- c("head", "tail")
+  sample(coin_sides, 1)
+  
+}
+```
+
+**4/4**
+
+-   Call your function.
+
+```{r}
+toss_coin()
+```
+
+## **Inputs to functions**
+
+Most functions require some sort of input to determine what to compute. The inputs to functions are called **arguments**. You specify them inside the parentheses after the word "function."
+
+As mentioned in the video, the following exercises assume that you are using `sample()` to do random sampling.
+
+**Instructions 1/2**
+
+-   Sample from `coin_sides` `n_flips` times with replacement.
+
+```{r}
+coin_sides <- c("head", "tail")
+n_flips <- 10
+
+# Sample from coin_sides n_flips times with replacement
+sample(coin_sides, n_flips, replace = TRUE)
+```
+
+**2/2**
+
+-   Update the definition of `toss_coin()` to accept a single argument, `n_flips`. The function should sample `coin_sides` `n_flips` times with replacement. *Remember to change the signature and the body.*
+
+-   Generate 10 coin flips.
+
+```{r}
+# Update the function to return n coin tosses
+toss_coin <- function(n_flips) {
+  coin_sides <- c("head", "tail")
+  sample(coin_sides, n_flips, replace = TRUE)
+}
+
+# Generate 10 coin tosses
+toss_coin(10)
+```
+
+## **Multiple inputs to functions**
+
+If a function should have more than one argument, list them in the function signature, separated by commas.
+
+To solve this exercise, you need to know how to specify sampling weights to `sample()`. Set the `prob` argument to a numeric vector with the same length as `x`. Each value of `prob` is the probability of sampling the corresponding element of `x`, so their values add up to one. In the following example, each sample has a 20% chance of `"bat"`, a 30% chance of `"cat"` and a 50% chance of `"rat"`.
+
+```         
+sample(c("bat", "cat", "rat"), 10, replace = TRUE, prob = c(0.2, 0.3, 0.5)) 
+```
+
+**Instructions 1/2**
+
+-   Bias the coin by weighting the sampling. Specify the `prob` argument so that heads are sampled with probability `p_head` (and tails are sampled with probability `1 - p_head`).
+
+```{r}
+coin_sides <- c("head", "tail")
+n_flips <- 10
+p_head <- 0.8
+
+# Define a vector of weights
+weights <- c(p_head, 1 - p_head)
+
+# Update so that heads are sampled with prob p_head
+sample(coin_sides, n_flips, replace = TRUE, prob = weights)
+```
+
+**2/2**
+
+-   Update the definition of `toss_coin()` so it accepts an argument, `p_head`, and weights the samples using the code you wrote in the previous step.
+
+-   Generate 10 coin tosses with an 80% chance of each head.
+
+```{r}
+# Update the function so heads have probability p_head
+toss_coin <- function(n_flips, p_head) {
+  coin_sides <- c("head", "tail")
+  # Define a vector of weights
+  weights <- c(p_head, 1 - p_head)
+  # Modify the sampling to be weighted
+  sample(coin_sides, n_flips, replace = TRUE, prob = weights)
+}
+
+# Generate 10 coin tosses
+toss_coin(10, 0.8)
 ```
 
 ## Video 1.3: Y kant I reed ur code?
@@ -203,9 +332,11 @@ A better name would be `run_linear_regression()`
 
 -   Understanding code \>\> typing code
 
+    -   The amount of time spent reading and understanding code is almost always longer than the time to type it.
+
 -   Code editors have autocomplete
 
--   You can alias common functions
+-   You can alias/assign functions just like any other variable type
 
 ```{r}
 h <- head
@@ -249,6 +380,788 @@ run_linear_regression <- function(data, formula) {
 ```
 
 ```{r}
+library(dplyr)
 cats %>% 
   run_linear_regression(Hwt ~ Bwt + Sex)
+```
+
+## **Renaming GLM**
+
+R's generalized linear regression function, `glm()`, suffers the same usability problems as `lm()`: its name is an acronym, and its `formula` and `data` arguments are in the wrong order.
+
+To solve this exercise, you need to know two things about generalized linear regression:
+
+1.  `glm()` formulas are specified like `lm()` formulas: response is on the left, and explanatory variables are added on the right.
+
+2.  To model count data, set `glm()`'s `family` argument to `poisson`, making it a Poisson regression.
+
+Here you'll use data on the [**number of yearly visits to Snake River**](https://www.rdocumentation.org/packages/COUNT/topics/loomis) at Jackson Hole, Wyoming, `snake_river_visits`.
+
+**Instructions 1/3**
+
+-   Run a generalized linear regression by calling `glm()`. Model `n_visits` vs. `gender`, `income`, and `travel` on the `snake_river_visits` dataset, setting the `family` to `poisson`.
+
+```{r}
+
+snake_river_visits <- readRDS("data/snake_river_visits.rds")
+# Run a generalized linear regression 
+glm(
+  # Model no. of visits vs. gender, income, travel
+  n_visits ~ gender + income + travel, 
+  # Use the snake_river_visits dataset
+  data = snake_river_visits, 
+  # Make it a Poisson regression
+  family = "poisson"
+)
+```
+
+**2/3**
+
+-   Define a function, `run_poisson_regression()`, to run a Poisson regression. This should take two arguments: `data` and `formula`, and call `glm()`, passing those arguments and setting `family` to `poisson`.
+
+```{r}
+# Write a function to run a Poisson regression
+run_poisson_regression <- function(data, formula) {
+glm(formula, data, family = "poisson")
+}
+```
+
+**3/3**
+
+-   Recreate the Poisson regression model from the first step, this time by calling your `run_poisson_regression()` function.
+
+```{r}
+# From previous step
+run_poisson_regression <- function(data, formula) {
+  glm(formula, data, family = poisson)
+}
+
+# Re-run the Poisson regression, using your function
+model <- snake_river_visits %>%
+  run_poisson_regression(n_visits ~ gender + income + travel)
+
+# # Run this to see the predictions
+# snake_river_explanatory %>%
+#   mutate(predicted_n_visits = predict(model, ., type = "response"))%>%
+#   arrange(desc(predicted_n_visits))
+```
+
+# Chapter 2: All About Arguments
+
+## Video 2.1: Default Arguments
+
+### `toss_coin` troubles
+
+```{r}
+toss_coin <- function(n_flips, p_head) {
+  coin_sides <- c("head", "tail")
+  weights <- c(p_head, 1 - p_head)
+  sample(coin_sides, n_flips, replace = TRUE, prob = weights)
+}
+```
+
+**Set the default in the signature.**
+
+```{r}
+toss_coin <- function(n_flips, p_head = 0.5) {
+  coin_sides <- c("head", "tail")
+  weights <- c(p_head, 1 - p_head)
+  sample(coin_sides, n_flips, replace = TRUE, prob = weights)
+}
+```
+
+### A template with defaults
+
+```{r}
+my_fun <- function(data_arg1, data_arg2, detail_arg1 = default1) {
+  # do something
+}
+```
+
+### Other types of default
+
+```{r}
+args(median)
+```
+
+```{r}
+library(jsonlite)
+args(fromJSON)
+```
+
+-   if you specify `simplifyVector`, you will change all three arguments together.
+
+### `NULL` defaults
+
+By convention, this means
+
+> The function will do some special handling of this argument. Please read the docs.
+
+```{r}
+args(set.seed)
+```
+
+### Categorical Defaults
+
+1.  Pass a character vector of all choices in the signature, then
+2.  Call `match.arg()` in the body.
+
+```{r}
+args(prop.test)
+```
+
+**Inside the body**
+
+```         
+alternative <- match.arg(alternative)
+```
+
+### Cutting vector by a quantile
+
+```{r}
+cut_by_quantile <- function(x, n, na.rm, labels, interval_type){
+  probs <- seq(0, 1, length.out = n + 1)
+  quantiles <- quantile(x, probs, na.rm = na.rm, names = FALSE)
+  right <- switch(interval_type, "(lo, hi]" = TRUE, "[lo, hi)" = FALSE)
+  cut(x, quantiles, labels = labels, right = right, include.lowest = TRUE)
+}
+```
+
+-   `x`: a numeric vector to cut
+
+-   `n`: the number of categories to cut `x` into
+
+-   `na.rm`: should missing value be removed?
+
+-   `labels`: character labels for the categories
+
+-   `interval_type`: should ranges be open on the left or the right?
+
+### Cat heart weights
+
+```{r}
+data(cats, package = "MASS")
+quantile(cats$Hwt)
+```
+
+### Cutting by quantile
+
+```         
+cut(x, quantile(x))
+```
+
+## **Numeric defaults**
+
+`cut_by_quantile()` converts a numeric vector into a categorical variable where quantiles define the cut points. This is a useful function, but at the moment you have to specify five arguments to make it work. This is too much thinking and typing.
+
+By specifying default arguments, you can make it easier to use. Let's start with `n`, which specifies how many categories to cut `x` into.
+
+A numeric vector of the number of visits to Snake River is provided as `n_visits`.
+
+**Instructions**
+
+-   Update the definition of `cut_by_quantile()` so that the `n` argument defaults to `5`.
+
+-   Remove the `n` argument from the call to `cut_by_quantile()`.
+
+```{r}
+# Set the default for n to 5
+cut_by_quantile <- function(x, n = 5, na.rm, labels, interval_type) {
+  probs <- seq(0, 1, length.out = n + 1)
+  qtiles <- quantile(x, probs, na.rm = na.rm, names = FALSE)
+  right <- switch(interval_type, "(lo, hi]" = TRUE, "[lo, hi)" = FALSE)
+  cut(x, qtiles, labels = labels, right = right, include.lowest = TRUE)
+}
+
+# Remove the n argument from the call
+cut_by_quantile(
+  n_visits,   
+  na.rm = FALSE, 
+  labels = c("very low", "low", "medium", "high", "very high"),
+  interval_type = "(lo, hi]"
+)
+```
+
+## **Logical defaults**
+
+`cut_by_quantile()` is now slightly easier to use, but you still always have to specify the `na.rm` argument. This removes missing values—it behaves the same as the `na.rm` argument to `mean()` or `sd()`.
+
+Where functions have an argument for removing missing values, the best practice is to **not** remove them by default (in case you hadn't spotted that you had missing values). That means that the default for `na.rm` should be `FALSE`.
+
+**Instructions**
+
+-   Update the definition of `cut_by_quantile()` so that the `na.rm` argument defaults to `FALSE`.
+
+-   Remove the `na.rm` argument from the call to `cut_by_quantile()`.
+
+```{r}
+# Set the default for na.rm to FALSE
+cut_by_quantile <- function(x, n = 5, na.rm = FALSE, labels, interval_type) {
+  probs <- seq(0, 1, length.out = n + 1)
+  qtiles <- quantile(x, probs, na.rm = na.rm, names = FALSE)
+  right <- switch(interval_type, "(lo, hi]" = TRUE, "[lo, hi)" = FALSE)
+  cut(x, qtiles, labels = labels, right = right, include.lowest = TRUE)
+}
+
+# Remove the na.rm argument from the call
+cut_by_quantile(
+  n_visits, 
+  labels = c("very low", "low", "medium", "high", "very high"),
+  interval_type = "(lo, hi]"
+)
+```
+
+## **NULL defaults**
+
+The `cut()` function used by `cut_by_quantile()` can automatically provide sensible labels for each category. The code to generate these labels is [**pretty complicated**](https://github.com/wch/r-source/blob/29a9e663a2352843a6ea26b259725b0b97d0e4bd/src/library/base/R/cut.R#L42-L60), so rather than appearing in the function signature directly, its `labels` argument defaults to `NULL`, and the calculation details are shown on the `cut()` help page ([**docs**](https://www.rdocumentation.org/packages/base/topics/cut)).
+
+**Instructions**
+
+-   Update the definition of `cut_by_quantile()` so that the `labels` argument defaults to `NULL`.
+
+-   Remove the `labels` argument from the call to `cut_by_quantile()`.
+
+```{r}
+# Set the default for labels to NULL
+cut_by_quantile <- function(x, n = 5, na.rm = FALSE, labels = NULL, interval_type) {
+  probs <- seq(0, 1, length.out = n + 1)
+  qtiles <- quantile(x, probs, na.rm = na.rm, names = FALSE)
+  right <- switch(interval_type, "(lo, hi]" = TRUE, "[lo, hi)" = FALSE)
+  cut(x, qtiles, labels = labels, right = right, include.lowest = TRUE)
+}
+
+# Remove the labels argument from the call
+cut_by_quantile(
+  n_visits,
+  interval_type = "(lo, hi]"
+)
+```
+
+## **Categorical defaults**
+
+When cutting up a numeric vector, you need to worry about what happens if a value lands exactly on a boundary. You can either put this value into a category of the lower interval or the higher interval. That is, you can choose your intervals to include values at the top boundary but not the bottom (in mathematical terminology, "open on the left, closed on the right", or `(lo, hi]`). Or you can choose the opposite ("closed on the left, open on the right", or `[lo, hi)`). `cut_by_quantile()` should allow these two choices.
+
+The pattern for categorical defaults is:
+
+```         
+function(cat_arg = c("choice1", "choice2")) {   
+    cat_arg <- match.arg(cat_arg) 
+} 
+```
+
+**Free hint**: In the console, type `head(rank)` to see the start of `rank()`'s definition, and look at the `ties.method` argument.
+
+**Instructions**
+
+-   Update the signature of `cut_by_quantile()` so that the `interval_type` argument can be `"(lo, hi]"` or `"[lo, hi)"`. *Note the space after each comma.*
+
+-   Update the body of `cut_by_quantile()` to match the `interval_type` argument.
+
+-   Remove the `interval_type` argument from the call to `cut_by_quantile()`.
+
+```{r}
+# Set the categories for interval_type to "(lo, hi]" and "[lo, hi)"
+cut_by_quantile <- function(x, n = 5, na.rm = FALSE, labels = NULL, 
+                            interval_type = c("(lo, hi]", "[lo, hi)")) {
+  # Match the interval_type argument
+  interval_type <- match.arg(interval_type)
+  probs <- seq(0, 1, length.out = n + 1)
+  qtiles <- quantile(x, probs, na.rm = na.rm, names = FALSE)
+  right <- switch(interval_type, "(lo, hi]" = TRUE, "[lo, hi)" = FALSE)
+  cut(x, qtiles, labels = labels, right = right, include.lowest = TRUE)
+}
+
+# Remove the interval_type argument from the call
+cut_by_quantile(n_visits)
+```
+
+## Video 2.2: Passing arguments between functions
+
+### Calculating the geometric mean
+
+```{r}
+x %>% 
+  log() %>% 
+  mean() %>% 
+  exp()
+```
+
+### Wrapping this in a function
+
+```{r}
+calc_geometric_mean <- function(x) {
+  x %>% 
+  log() %>% 
+  mean() %>% 
+  exp()
+}
+```
+
+### Handling missing values
+
+```{r}
+calc_geometric_mean <- function(x, na.rm = FALSE) {
+  x %>% 
+  log() %>% 
+  mean(na.rm = na.rm) %>% 
+  exp()
+}
+```
+
+### Using...
+
+```         
+calc_geometric_mean <- function(x, ...) {
+  x %>% 
+    log() %>% 
+    mean(...) %>% 
+    exp()
+}
+```
+
+### The tradeoff
+
+**Benefits**
+
+-   Less typing for you
+
+-   No need to match signatures
+
+**Drawbacks**
+
+-   You need to trust the inner function
+
+-   The interface is not as obvious to users
+
+## **Harmonic mean**
+
+The harmonic mean is the reciprocal of the arithmetic mean of the reciprocal of the data. That is
+
+$harmonic\_mean(x) = 1/arithmetic\_mean(1/x)$
+
+The harmonic mean is often used to average ratio data. You'll be using it on the price/earnings ratio of stocks in the Standard and Poor's 500 index, provided as `std_and_poor500`. Price/earnings ratio is a measure of how expensive a stock is.
+
+The `dplyr` package is loaded.
+
+**Instructions 1/3**
+
+-   *Look at `std_and_poor500` (you'll need this later).* Write a function, `get_reciprocal`, to get the reciprocal of an input `x`. Its only argument should be `x`, and it should return one over `x`.
+
+```{r}
+std_and_poor500 <- readRDS("data/std_and_poor500_with_pe_2019-06-21.rds")
+# Look at the Standard and Poor 500 data
+glimpse(std_and_poor500)
+
+# Write a function to calculate the reciprocal
+get_reciprocal <- function(x) {
+  return (1/x)
+}
+```
+
+**2/3**
+
+-   Write a function, `calc_harmonic_mean()`, that calculates the harmonic mean of its only input, `x`.
+
+```{r}
+# From previous step
+get_reciprocal <- function(x) {
+  1 / x
+}
+
+# Write a function to calculate the harmonic mean
+calc_harmonic_mean <- function(x) {
+  x %>%
+    log() %>%
+    mean() %>%
+    exp()
+}
+```
+
+**3/3**
+
+-   Using `std_and_poor500`, group by `sector`, and summarize to calculate the harmonic mean of the price/earning ratios in the `pe_ratio` column.
+
+```{r}
+# From previous steps
+get_reciprocal <- function(x) {
+  1 / x
+}
+calc_harmonic_mean <- function(x) {
+  x %>%
+    get_reciprocal() %>%
+    mean() %>%
+    get_reciprocal()
+}
+
+std_and_poor500 %>% 
+  # Group by sector
+  group_by(sector) %>% 
+  # Summarize, calculating harmonic mean of P/E ratio
+  summarize(hmean_pe_ratio = calc_harmonic_mean(pe_ratio))
+```
+
+## **Dealing with missing values**
+
+In the last exercise, many sectors had an `NA` value for the harmonic mean. It would be useful for your function to be able to remove missing values before calculating.
+
+Rather than writing your own code for this, you can outsource this functionality to `mean()`.
+
+The `dplyr` package is loaded.
+
+**Instructions 1/2**
+
+**50 XP**
+
+-   Modify the signature and body of `calc_harmonic_mean()` so it has an `na.rm` argument, defaulting to false, that gets passed to `mean()`.
+
+```{r}
+# Add an na.rm arg with a default, and pass it to mean()
+calc_harmonic_mean <- function(x, na.rm = FALSE) {
+  x %>%
+    get_reciprocal() %>%
+    mean(na.rm = na.rm) %>%
+    get_reciprocal()
+}
+```
+
+**2/2**
+
+-   Using `std_and_poor500`, group by `sector`, and summarize to calculate the harmonic mean of the price/earning ratios in the `pe_ratio` column, removing missing values.
+
+```{r}
+# From previous step
+calc_harmonic_mean <- function(x, na.rm = FALSE) {
+  x %>%
+    get_reciprocal() %>%
+    mean(na.rm = na.rm) %>%
+    get_reciprocal()
+}
+
+std_and_poor500 %>% 
+  # Group by sector
+  group_by(sector) %>% 
+  # Summarize, calculating harmonic mean of P/E ratio
+  summarize(hmean_pe_ratio = calc_harmonic_mean(pe_ratio, na.rm = TRUE))
+```
+
+## **Passing arguments with `...`**
+
+Rather than explicitly giving `calc_harmonic_mean()` and `na.rm` argument, you can use `...` to simply "pass other arguments" to `mean()`.
+
+The `dplyr` package is loaded.
+
+**Instructions 1/2**
+
+-   Replace the `na.rm` argument with `...` in the signature and body of `calc_harmonic_mean()`.
+
+```{r}
+# Swap na.rm arg for ... in signature and body
+calc_harmonic_mean <- function(x, ...) {
+  x %>%
+    get_reciprocal() %>%
+    mean(...) %>%
+    get_reciprocal()
+}
+```
+
+**2/2**
+
+-   Using `std_and_poor500`, group by `sector`, and summarize to calculate the harmonic mean of the price/earning ratios in the `pe_ratio` column, removing missing values.
+
+```{r}
+calc_harmonic_mean <- function(x, ...) {
+  x %>%
+    get_reciprocal() %>%
+    mean(...) %>%
+    get_reciprocal()
+}
+
+std_and_poor500 %>% 
+  # Group by sector
+  group_by(sector) %>% 
+  # Summarize, calculating harmonic mean of P/E ratio
+  summarize(hmean_pe_ratio = calc_harmonic_mean(pe_ratio, na.rm = TRUE))
+```
+
+## Video 2.3: Checking arguments
+
+### The geometric mean
+
+```{r}
+calc_geometric_mean <- function(x, na.rm = FALSE) {
+  x %>% 
+    log() %>% 
+    mean(na.rm = na.rm) %>% 
+    exp()
+}
+```
+
+```{r}
+# calc_geometric_mean(letters)
+# 
+# Error in log(.) : non-numeric argument to mathematical function
+```
+
+### Checking for numeric values
+
+```{r}
+calc_geometric_mean <- function(x, na.rm = FALSE) {
+  if(!is.numeric(x)) {
+    stop("x is not of class 'numeric'; it has class '", class(x), "'.")
+  }
+  x %>% 
+    log() %>% 
+    mean(na.rm = na.rm) %>% 
+    exp()
+}
+```
+
+```{r}
+# calc_geometric_mean(letters)
+# 
+# Error in calc_geometric_mean(letters) : 
+#   x is not of class 'numeric'; it has class 'character'.
+```
+
+### `assertive` makes errors easy
+
+### Checking types of inputs
+
+-   `assert_is_numeric()`
+
+-   `assert_is_character()`
+
+-   `is_data.frame()`
+
+-   ...
+
+-   `is_two_sided_formula()`
+
+-   `is_tskernel()`
+
+### Using `assertive` to check `x`
+
+```         
+calc_geometric_mean <- function(x, na.rm = FALSE) {
+  assert_is_numeric(x)
+  x %>% 
+    log() %>% 
+    mean(na.rm = na.rm) %>% 
+    exp()
+}
+```
+
+```         
+Error in calc_geometric_mean(letters) :   
+  is_numeric : x is not of class 'numeric'; it has class 'character'.
+```
+
+### Checking `x` is positive
+
+```         
+calc_geometric_mean <- function(x, na.rm = FALSE) {
+  assert_is_numeric(x)
+  assert_all_are_positive(x)
+  x %>% 
+    log() %>% 
+    mean(na.rm = na.rm) %>% 
+    exp()
+}
+```
+
+```         
+calc_geometric_mean(c(1, -1))
+```
+
+```         
+Error in calc_geometric_mean(c(1, -1)) :  
+  is_positive : x contains non-positive values.
+There was 1 failure:  
+  Position Value   Cause
+1        2    -1 too low
+```
+
+### `is_*` functions
+
+-   `assert_is_numeric()`
+
+-   `assert_all_are_positive()`
+
+-   `is_numeric()` (returns logical value)
+
+-   `is_positive` (returns logical vector
+
+-   `is_non_positive()`
+
+### Custom checks
+
+```         
+calc_geometric_mean <- function(x, na.rm = FALSE) {
+  assert_is_numeric(x)
+  if(any(is_non_positive(x), na.rm = TRUE)) {
+    stop("x contains non-positive values, so the geometric mean makes no sense")
+  }
+  x %>% 
+    log() %>% 
+    mean(na.rm = na.rm) %>% 
+    exp()
+}
+```
+
+```         
+calc_geometric_mean(c(1, -1))
+```
+
+```         
+Error in calc_geometric_mean(c(1, -1)) :   
+  x contains non-positive values, so the geometric mean makes no sense.
+```
+
+### Fixing input
+
+```         
+use_first(c(1, 4, 9, 16))
+```
+
+```         
+[1] 1
+Warning message:
+Only the first value of c(1, 4, 9, 16) (= 1) will be used
+```
+
+```         
+coerce_to(c(1, 4, 9, 16), "character")
+```
+
+```         
+[1] "1" "4" "9" "16"
+
+Warning message:Coercing c(1, 4, 9, 16) to class ‘character’.
+```
+
+### Fixing `na.rm`
+
+```         
+calc_geometric_mean <- function(x, na.rm = FALSE) {
+  assert_is_numeric(x)
+  if(any(is_non_positive(x), na.rm = TRUE)) {
+    stop("x contains non-positive values, so the geometric mean makes no sense")
+  }
+  na.rm <- coerce_to(use_first(na.rm), target_class = "logical")
+  x %>% 
+    log() %>% 
+    mean(na.rm = na.rm) %>% 
+    exp()
+}
+```
+
+```         
+calc_geometric_mean(1:5, na.rm = 1:5)
+```
+
+```         
+[1] 2.605171
+Warning messages:
+1: Only the first value of na.rm (= 1) will be used. 
+2: Coercing use_first(na.rm) to class ‘logical’.
+```
+
+## **Throwing errors with bad arguments**
+
+If a user provides a bad input to a function, the best course of action is to throw an error letting them know. The two rules are
+
+1.  Throw the error message as soon as you realize there is a problem (typically at the start of the function).
+
+2.  Make the error message easily understandable.
+
+You can use the `assert_*()` functions from `assertive` to check inputs and throw errors when they fail.
+
+**Instructions**
+
+-   Add a line to the body of `calc_harmonic_mean()` to assert that `x` is numeric.
+
+-   *Look at what happens when you pass a character argument to `calc_harmonic_mean()`*
+
+```{r}
+# calc_harmonic_mean <- function(x, na.rm = FALSE) {
+#   # Assert that x is numeric
+#   assert_is_numeric(x)
+#   x %>%
+#     get_reciprocal() %>%
+#     mean(na.rm = na.rm) %>%
+#     get_reciprocal()
+# }
+# 
+# # See what happens when you pass it strings
+# calc_harmonic_mean(std_and_poor500$sector)
+
+# Error: is_numeric : x is not of class 'numeric'; it has class 'character'.
+```
+
+## **Custom error logic**
+
+Sometimes the `assert_*()` functions in `assertive` don't give the most informative error message. For example, the assertions that check if a number is in a numeric range will tell the user that a value is out of range, but the won't say why that's a problem. In that case, you can use the `is_*()` functions in conjunction with messages, warnings, or errors to define custom feedback.
+
+The harmonic mean only makes sense when `x` has all positive values. (Try calculating the harmonic mean of one and minus one to see why.) Make sure your users know this!
+
+**Instructions**
+
+-   If any values of `x` are non-positive (ignoring `NA`s) then throw an error.
+
+-   *Look at what happens when you pass a character argument to `calc_harmonic_mean()`*
+
+```{r}
+# calc_harmonic_mean <- function(x, na.rm = FALSE) {
+#   assert_is_numeric(x)
+#   # Check if any values of x are non-positive
+#   if(any(is_non_positive(x), na.rm = TRUE)) {
+#     # Throw an error
+#     stop("x contains non-positive values, so the harmonic mean makes no sense.")
+#   }
+#   x %>%
+#     get_reciprocal() %>%
+#     mean(na.rm = na.rm) %>%
+#     get_reciprocal()
+# }
+# 
+# # See what happens when you pass it negative numbers
+# calc_harmonic_mean(std_and_poor500$pe_ratio - 20)
+# 
+# Error: x contains non-positive values, so the harmonic mean makes no sense.
+```
+
+## **Fixing function arguments**
+
+The harmonic mean function is almost complete. However, you still need to provide some checks on the `na.rm` argument. This time, rather than throwing errors when the input is in an incorrect form, you are going to try to fix it.
+
+`na.rm` should be a logical vector with one element (that is, `TRUE`, or `FALSE`).
+
+The `assertive` package is loaded for you.
+
+**Instructions**
+
+-   Update `calc_harmonic_mean()` to fix the `na.rm` argument by using `use_first()` to select the first `na.rm` element, and `coerce_to()` to change it to logical.
+
+```{r}
+# # Update the function definition to fix the na.rm argument
+# calc_harmonic_mean <- function(x, na.rm = FALSE) {
+#   assert_is_numeric(x)
+#   if(any(is_non_positive(x), na.rm = TRUE)) {
+#     stop("x contains non-positive values, so the harmonic mean makes no sense.")
+#   }
+#   # Use the first value of na.rm, and coerce to logical
+#   na.rm <- coerce_to(use_first(na.rm), target_class = "logical")
+#   x %>%
+#     get_reciprocal() %>%
+#     mean(na.rm = na.rm) %>%
+#     get_reciprocal()
+# }
+# 
+# # See what happens when you pass it malformed na.rm
+# calc_harmonic_mean(std_and_poor500$pe_ratio, na.rm = 1:5)
+# 
+# Warning message: Only the first value of na.rm (= 1) will be used.
+# Warning message: Coercing use_first(na.rm) to class ‘logical’.
+# 
+# [1] 18.23871
 ```
