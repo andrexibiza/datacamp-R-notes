@@ -1,0 +1,214 @@
+---
+title: "Intermediate Regression in R"
+output: html_notebook
+---
+
+Linear regression and logistic regression are the two most widely used statistical models and act like master keys, unlocking the secrets hidden in datasets. This course builds on the skills you gained in "Introduction to Regression in R", covering linear and logistic regression with multiple explanatory variables. Through hands-on exercises, you’ll explore the relationships between variables in real-world datasets, Taiwan house prices and customer churn modeling, and more. By the end of this course, you’ll know how to include multiple explanatory variables in a model, understand how interactions between variables affect predictions, and understand how linear and logistic regression work.
+
+```{r}
+# Load packages
+library(fst)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+# Load course data
+churn <- read.fst("data/churn.fst")
+taiwan <- read.fst("data/taiwan_real_estate2.fst")
+fish <- read_csv("data/fish.csv") %>% 
+  select(Species, Weight, Length3)
+
+# Downloaded from https://www.kaggle.com/onlineauctions/online-auctions-dataset
+
+
+auctions_raw <- read_csv("data/auction.csv")
+
+# Palm pilot has most data, no outliers
+auctions <- auctions_raw %>%
+  filter(item == "Palm Pilot M515 PDA") %>%
+  select(price, openbid, auction_type)
+
+write_fst(auctions, "auctions.fst")
+```
+
+```{r}
+# `fish` data from https://www.kaggle.com/datasets/vipullrathod/fish-market
+# Filtering Kaggle data for species of interest to match course materials
+fish <- fish %>% 
+  filter(Species %in% c("Bream", "Roach", "Perch", "Pike")) %>% 
+  rename(species = Species,
+         mass_g = Weight,
+         length_cm = Length3)
+fish
+
+
+```
+
+
+
+
+# Chapter 1: Parallel Slopes
+
+## Video 1.1: Parallel slopes linear regression
+
+### From simple regression to multiple regression
+- *Multiple regression* is a regression model with more than one explanatory variable.
+- More explanatory variables can give **more insight** and **better predictions**.
+
+### Course contents
+**Chapter 1**
+- Parallel slopes regression
+
+**Chapter 2**
+- Interactions
+- Simpson's Paradox
+
+**Chapter 3**
+- More explanatory variables
+- How linear regression works
+
+**Chapter 4**
+- Multiple logistic regression
+- The logistic distribution
+- How logistic regression works
+
+### The `fish` dataset
+- Each row represents a fish
+- `mass_g` is the response variable
+- 1 numeric, 1 categorical explanatory variable
+
+
+### One explanatory variable at a time
+```{r}
+mdl_mass_vs_length <- lm(mass_g ~ length_cm, data = fish)
+mdl_mass_vs_length
+```
+- 1 intercept coefficient
+- 1 slope coefficient
+
+```{r}
+mdl_mass_vs_species <- lm(mass_g ~ species + 0, data = fish)
+mdl_mass_vs_species
+```
+- 1 intercept coefficient for each category
+
+### Both variables at the same time
+```{r}
+mdl_mass_vs_both <- lm(mass_g ~ length_cm + species + 0, data = fish)
+mdl_mass_vs_both
+```
+- 1 slope coefficient
+- 1 intercept coefficient for each category
+
+### Comparing coefficients
+```{r}
+coefficients(mdl_mass_vs_length)
+```
+
+```{r}
+coefficients(mdl_mass_vs_species)
+```
+
+```{r}
+coefficients(mdl_mass_vs_both)
+```
+### Visualization: 1 numeric explanatory var
+
+```{r}
+ggplot(fish, aes(length_cm, mass_g)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+### Visualization: 1 categorical explanatory var
+```{r}
+ggplot(fish, aes(species, mass_g)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, shape = 15)
+```
+
+### Visualization: Both explanatory vars
+
+```{r}
+library(moderndive)
+ggplot(fish, aes(length_cm, mass_g, color = species)) +
+  geom_point() +
+  geom_parallel_slopes(se = FALSE)
+```
+
+
+## Video 1.2: Predicting Parallel Slopes
+
+### The prediction workflow
+```{r}
+explanatory_data <- tibble(
+  length_cm = seq(5, 60, 5)
+)
+glimpse(explanatory_data)
+```
+```{r}
+explanatory_data <- expand_grid(
+  length_cm = seq(5, 60, 5),
+  species = unique(fish$species)
+)
+glimpse(explanatory_data)
+```
+```{r}
+prediction_data <- explanatory_data %>%
+  mutate(
+    mass_g = predict(mdl_mass_vs_length, explanatory_data
+                     )
+  )
+```
+
+```{r}
+prediction_data <- explanatory_data %>%
+  mutate(
+    mass_g = predict(mdl_mass_vs_both, explanatory_data
+                     )
+  )
+prediction_data
+```
+
+### Visualizing the predictions
+```{r}
+library(ggplot2)
+library(moderndive)
+ggplot(fish, aes(length_cm, mass_g, color = species)) +
+  geom_point() +
+  geom_parallel_slopes(se = FALSE) +
+  geom_point(
+    data = prediction_data,
+    size = 3, shape = 15
+  )
+```
+### Manually calculating predictions
+```{r}
+coeffs <- coefficients(mdl_mass_vs_length)
+coeffs
+```
+```{r}
+intercept <- coeffs[1]
+slope <- coeffs[2]
+
+explanatory_data %>% 
+  mutate(
+    mass_g = intercept + slope * length_cm
+  )
+explanatory_data
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
