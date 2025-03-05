@@ -3,7 +3,69 @@ title: "Intermediate Regression in R"
 output: html_notebook
 ---
 
+# DataCamp: Intermediate Regression in R
+
 Linear regression and logistic regression are the two most widely used statistical models and act like master keys, unlocking the secrets hidden in datasets. This course builds on the skills you gained in "Introduction to Regression in R", covering linear and logistic regression with multiple explanatory variables. Through hands-on exercises, you’ll explore the relationships between variables in real-world datasets, Taiwan house prices and customer churn modeling, and more. By the end of this course, you’ll know how to include multiple explanatory variables in a model, understand how interactions between variables affect predictions, and understand how linear and logistic regression work.
+
+## Challenging Data Setup
+
+The [course page](https://app.datacamp.com/learn/courses/intermediate-regression-in-r) contains three files:
+
+1)  Taiwan real estate (`taiwan_real_estate2.fst`)
+
+2)  eBay Palm Pilot auctions (`create-ebay-palm-pilot-auctions-dataset.R`)
+
+3)  Bank churn (`churn.fst`)
+
+Download the files into your `data` folder for your project.Import `.fst` files
+
+`.fst` files are a fast and efficient file format for storing large data frames in R. They offer high compression and rapid read/write speeds - `.fst` files provide faster read/write operations and better compression compared to traditional formats like `.csv`, making them suitable for large datasets. To work with `.fst` files in R, you can use the `fst` package. Here's a brief guide:
+
+-   Installation: Install the `fst` package if you haven't already.
+
+```         
+install.packages("fst")
+```
+
+-   Reading `.fst` Files: Use the `read_fst` function to load data from an `.fst` file.
+
+```         
+library(fst)
+data <- read_fst("path/to/your/file.fst")
+```
+
+-   Writing `.fst` Files: Use the `write_fst` function to save a data frame to an `.fst` file.
+
+```         
+write_fst(data, "path/to/your/file.fst")
+```
+
+### eBay Palm Pilot auctions
+
+The file on the course page includes the following script.
+
+```         
+# Downloaded from https://www.kaggle.com/onlineauctions/online-auctions-dataset
+library(readr)
+library(fst)
+
+auctions_raw <- read_csv("~/Downloads/361_760_bundle_archive/auction.csv")
+
+# Palm pilot has most data, no outliers
+auctions <- auctions_raw %>%
+  filter(item == "Palm Pilot M515 PDA") %>%
+  select(price, openbid, auction_type)
+
+write_fst(auctions, "auctions.fst")
+```
+
+The problem is that the file path `"~/Downloads/361_760_bundle_archive/auction.csv"` takes us nowhere.
+
+```         
+Error: '~/Downloads/361_760_bundle_archive/auction.csv' does not exist.
+```
+
+You first have to download the `.csv` file from the [Kaggle Online Auctions Dataset](https://www.kaggle.com/onlineauctions/online-auctions-dataset) and adjust the path. For all of my projects, I prefer to keep my source data files in a `data` folder within the project directory. Lastly, run the script to create the `.fst` file. The `read_fst` function will then load the data into R.
 
 ```{r}
 # Load packages
@@ -15,13 +77,10 @@ library(tidyr)
 
 # Load course data
 churn <- read.fst("data/churn.fst")
-taiwan <- read.fst("data/taiwan_real_estate2.fst")
-fish <- read_csv("data/fish.csv") %>% 
-  select(Species, Weight, Length3)
+taiwan_real_estate <- read.fst("data/taiwan_real_estate2.fst")
 
-# Downloaded from https://www.kaggle.com/onlineauctions/online-auctions-dataset
-
-
+#---Online Auctions dataset R script from course page----
+# Dataset downloaded from https://www.kaggle.com/onlineauctions/online-auctions-dataset in .csv format
 auctions_raw <- read_csv("data/auction.csv")
 
 # Palm pilot has most data, no outliers
@@ -29,79 +88,87 @@ auctions <- auctions_raw %>%
   filter(item == "Palm Pilot M515 PDA") %>%
   select(price, openbid, auction_type)
 
-write_fst(auctions, "auctions.fst")
+write_fst(auctions, "data/auctions.fst") # for consistency
+#----
 ```
+
+## Additional datasets
+
+### `fish`
+
+The first video in the course introduces a `fish` dataset not provided in the course materials. Using a Google search, I found a match for the same dataset on [Kaggle](https://www.kaggle.com/datasets/vipullrathod/fish-market). The following script transforms the `Fish.csv` file from Kaggle into a data frame to match the course materials.
 
 ```{r}
 # `fish` data from https://www.kaggle.com/datasets/vipullrathod/fish-market
 # Filtering Kaggle data for species of interest to match course materials
-fish <- fish %>% 
-  filter(Species %in% c("Bream", "Roach", "Perch", "Pike")) %>% 
+fish <- read_csv("data/fish.csv") %>%
+  select(Species, Weight, Length3) %>%
   rename(species = Species,
          mass_g = Weight,
-         length_cm = Length3)
-fish
-
+         length_cm = Length3) %>%
+  filter(species %in% c("Bream", "Roach", "Perch", "Pike"))
+fish  
 
 ```
 
-
-
+Now we are ready to begin Chapter 1!
 
 # Chapter 1: Parallel Slopes
+
+Extend your linear regression skills to "parallel slopes" regression, with one numeric and one categorical explanatory variable. This is the first step towards conquering multiple linear regression.
 
 ## Video 1.1: Parallel slopes linear regression
 
 ### From simple regression to multiple regression
-- *Multiple regression* is a regression model with more than one explanatory variable.
-- More explanatory variables can give **more insight** and **better predictions**.
+
+-   *Multiple regression* is a regression model with more than one explanatory variable.
+-   More explanatory variables can give **more insight** and **better predictions**.
 
 ### Course contents
-**Chapter 1**
-- Parallel slopes regression
 
-**Chapter 2**
-- Interactions
-- Simpson's Paradox
+**Chapter 1** - Parallel slopes regression
 
-**Chapter 3**
-- More explanatory variables
-- How linear regression works
+**Chapter 2** - Interactions - Simpson's Paradox
 
-**Chapter 4**
-- Multiple logistic regression
-- The logistic distribution
-- How logistic regression works
+**Chapter 3** - More explanatory variables - How linear regression works
+
+**Chapter 4** - Multiple logistic regression - The logistic distribution - How logistic regression works
 
 ### The `fish` dataset
-- Each row represents a fish
-- `mass_g` is the response variable
-- 1 numeric, 1 categorical explanatory variable
 
+-   Each row represents a fish
+-   `mass_g` is the response variable
+-   1 numeric, 1 categorical explanatory variable
 
 ### One explanatory variable at a time
+
 ```{r}
 mdl_mass_vs_length <- lm(mass_g ~ length_cm, data = fish)
 mdl_mass_vs_length
 ```
-- 1 intercept coefficient
-- 1 slope coefficient
+
+-   1 intercept coefficient
+-   1 slope coefficient
 
 ```{r}
 mdl_mass_vs_species <- lm(mass_g ~ species + 0, data = fish)
 mdl_mass_vs_species
 ```
-- 1 intercept coefficient for each category
+
+-   1 intercept coefficient for each category
 
 ### Both variables at the same time
+
 ```{r}
 mdl_mass_vs_both <- lm(mass_g ~ length_cm + species + 0, data = fish)
 mdl_mass_vs_both
 ```
-- 1 slope coefficient
-- 1 intercept coefficient for each category
+
+-   1 slope coefficient
+-   1 intercept coefficient for each category
 
 ### Comparing coefficients
+
 ```{r}
 coefficients(mdl_mass_vs_length)
 ```
@@ -113,6 +180,7 @@ coefficients(mdl_mass_vs_species)
 ```{r}
 coefficients(mdl_mass_vs_both)
 ```
+
 ### Visualization: 1 numeric explanatory var
 
 ```{r}
@@ -120,11 +188,13 @@ ggplot(fish, aes(length_cm, mass_g)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE)
 ```
+
 ### Visualization: 1 categorical explanatory var
+
 ```{r}
 ggplot(fish, aes(species, mass_g)) +
   geom_boxplot() +
-  stat_summary(fun.y = mean, shape = 15)
+  stat_summary(fun.y = mean, shape = 15) # shape makes mean points square
 ```
 
 ### Visualization: Both explanatory vars
@@ -136,16 +206,143 @@ ggplot(fish, aes(length_cm, mass_g, color = species)) +
   geom_parallel_slopes(se = FALSE)
 ```
 
+## **Fitting a parallel slopes linear regression**
+
+In [**Introduction to Regression in R**](https://learn.datacamp.com/courses/introduction-to-regression-in-r), you learned to fit linear regression models with a single explanatory variable. In many cases, using only one explanatory variable limits the accuracy of predictions. That means that to truly master linear regression, you need to be able to include multiple explanatory variables.
+
+The case when there is one numeric explanatory variable and one categorical explanatory variable is sometimes called a "parallel slopes" linear regression due to the shape of the predictions—more on that in the next exercise.
+
+Here, you'll revisit the Taiwan real estate dataset. Recall the meaning of each variable.
+
+| Variable | Meaning |
+|:---|:---|
+| `dist_to_mrt_station_m` | Distance to nearest MRT metro station, in meters. |
+| `n_convenience` | No. of convenience stores in walking distance. |
+| `house_age_years` | The age of the house, in years, in 3 groups. |
+| `price_twd_msq` | House price per unit area, in New Taiwan dollars per meter squared. |
+
+`taiwan_real_estate` is available.
+
+**Instructions 1/3**
+
+-   Using the `taiwan_real_estate` dataset, model the house price (in TWD per square meter) versus the number of nearby convenience stores.
+
+```{r}
+# Fit a linear regr'n of price_twd_msq vs. n_convenience
+mdl_price_vs_conv <- lm(price_twd_msq ~ n_convenience, data = taiwan_real_estate)
+
+# See the result
+mdl_price_vs_conv
+```
+
+**2/2:** Model the house price (in TWD per square meter) versus the house age (in years). Don't include an intercept term.
+
+```{r}
+# Fit a linear regr'n of price_twd_msq vs. house_age_years, no intercept
+mdl_price_vs_age <- lm(price_twd_msq ~ house_age_years - 1, data = taiwan_real_estate)
+
+# See the result
+mdl_price_vs_age
+```
+
+**3/3**: Model the house price (in TWD per square meter) versus the number of nearby convenience stores plus the house age (in years). Don't include an intercept term.
+
+```{r}
+# Fit a linear regr'n of price_twd_msq vs. n_convenience plus house_age_years, no intercept
+mdl_price_vs_both <- lm(price_twd_msq ~ n_convenience + house_age_years - 1, data = taiwan_real_estate)
+
+# See the result
+mdl_price_vs_both
+```
+
+## **Interpreting parallel slopes coefficients**
+
+For linear regression with a single numeric explanatory variable, there is an intercept coefficient and a slope coefficient. For linear regression with a single categorical explanatory variable, there is an intercept coefficient for each category.
+
+In the "parallel slopes" case, where you have a numeric and a categorical explanatory variable, what do the coefficients mean?
+
+## **Visualizing each explanatory variable**
+
+Being able to see the predictions made by a model makes it easier to understand. In the case where there is only one explanatory variable, ggplot lets you do this without any manual calculation or messing about.
+
+To visualize the relationship between a numeric explanatory variable and the numeric response, you can draw a scatter plot with a linear trend line.
+
+To visualize the relationship between a categorical explanatory variable and the numeric response, you can draw a box plot.
+
+`taiwan_real_estate` is available and `ggplot2` is loaded.
+
+**Instructions 1/2**
+
+-   Using the `taiwan_real_estate` dataset, plot the house price versus the number of nearby convenience stores.
+
+-   Make it a scatter plot.
+
+-   Add a smooth linear regression trend line without a standard error ribbon.
+
+```{r}
+# Using taiwan_real_estate, plot price_twd_msq vs. n_convenience
+ggplot(taiwan_real_estate, aes(n_convenience, price_twd_msq)) +
+  # Add a point layer
+  geom_point() +
+  # Add a smooth trend line using linear regr'n, no ribbon
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+**2/2**
+
+-   Using the `taiwan_real_estate` dataset, plot the house price versus the house age.
+
+-   Make it a box plot.
+
+```{r}
+# Using taiwan_real_estate, plot price_twd_msq vs. house_age_years
+ggplot(taiwan_real_estate, aes(house_age_years, price_twd_msq)) +
+  # Add a box plot layer
+  geom_boxplot()
+```
+
+## **Visualizing parallel slopes**
+
+The two plots in the previous exercise gave very different predictions: one gave a predicted response that increased linearly with a numeric variable; the other gave a fixed response for each category. The only sensible way to reconcile these two conflicting predictions is to incorporate both explanatory variables in the model at once.
+
+When it comes to a linear regression model with a numeric and a categorical explanatory variable, `ggplot2` doesn't have an easy, "out of the box" way to show the predictions. Fortunately, the `moderndive` package includes an extra geom, `geom_parallel_slopes()` to make it simple.
+
+`taiwan_real_estate` is available; `ggplot2` and `moderndive` are loaded.
+
+**Instructions**
+
+-   Using the `taiwan_real_estate` dataset, plot house prices versus the number of nearby convenience stores, colored by house age.
+
+-   Make it a scatter plot.
+
+-   Add parallel slopes, without a standard error ribbon.
+
+```{r}
+library(moderndive)
+
+# Using taiwan_real_estate, plot price_twd_msq vs. n_convenience colored by house_age_years
+ggplot(taiwan_real_estate, aes(x = n_convenience, y = price_twd_msq, color = house_age_years)) +
+  # Add a point layer
+  geom_point() +
+  # Add parallel slopes, no ribbon
+  geom_parallel_slopes(se = FALSE)
+```
 
 ## Video 1.2: Predicting Parallel Slopes
 
+Predicting responses is perhaps the most useful feature of regression models. With two explanatory variables, the code for prediction has one subtle difference from the case with a single explanatory variable.
+
 ### The prediction workflow
+
+The prediction workflow starts with choosing values for explanatory variables. You pick any values you want, and store them in a data frame or tibble. For a single explanatory variable, the data frame has one column. Here, it's a sequence of lengths from 5cm to 60cm, in steps of 5cm. For multiple explanatory variables, it's the same process, but there's a useful trick. `expand_grid` from the `tidyr` package returns a data frame of all combinations of its inputs. Here, you have 5cm and each fish species, 10cm and each fish species, through to 60cm and each fish species.
+
 ```{r}
 explanatory_data <- tibble(
   length_cm = seq(5, 60, 5)
 )
 glimpse(explanatory_data)
 ```
+
 ```{r}
 explanatory_data <- expand_grid(
   length_cm = seq(5, 60, 5),
@@ -153,6 +350,9 @@ explanatory_data <- expand_grid(
 )
 glimpse(explanatory_data)
 ```
+
+Next you add a column of predictions to the data frame. To calculate the predictions, call `predict`, passing the model and the explanatory data. Here's the code for one explanatory variable. With two or more explanatory variables, other than the model variable name, the code is exactly the same!
+
 ```{r}
 prediction_data <- explanatory_data %>%
   mutate(
@@ -171,6 +371,9 @@ prediction_data
 ```
 
 ### Visualizing the predictions
+
+Just as in the single explanatory variable case, we can visualize the predictions from the model by adding another `geom_point` layer and setting the data argument to prediction_data. I set the size and shape arguments to make the predictions big square points. A good sign that this worked is that the prediction points lie along the lines calculated by ggplot.
+
 ```{r}
 library(ggplot2)
 library(moderndive)
@@ -182,11 +385,18 @@ ggplot(fish, aes(length_cm, mass_g, color = species)) +
     size = 3, shape = 15
   )
 ```
+
 ### Manually calculating predictions
+
+In the previous course, you saw how to manually calculate the predictions. The `coefficients` function extracts the coefficients from the model. The intercept is the first coefficient, and the slope is the second coefficient. Then the response value is the intercept plus the slope times the explanatory variable.
+
 ```{r}
 coeffs <- coefficients(mdl_mass_vs_length)
 coeffs
 ```
+
+Then the response value is the intercept plus the slope times the explanatory variable.
+
 ```{r}
 intercept <- coeffs[1]
 slope <- coeffs[2]
@@ -198,17 +408,605 @@ explanatory_data %>%
 explanatory_data
 ```
 
-
 ### Coefficients for parallel slopes
 
+For the parallel slopes model, there is an added complication. Each category of the categorical variable has a different intercept. Due to the way we specified the model, the slope coefficient is the first one.
+
+```{r}
+coefficients(mdl_mass_vs_both)
+```
+
+```{r}
+slope <- coeffs[1]
+intercept_bream <- coeffs[2]
+intercept_perch <- coeffs[3]
+intercept_pike <- coeffs[4]
+intercept_roach <- coeffs[5]
+```
+
+### Choosing an intercept with `ifelse()`
+
+You can choose this intercept using `if-else` statements, but this becomes clunky when you have lots of categories. With just four categories, these nested calls to `ifelse` are hard to write and hard to read. It's a recipe for buggy code.
+
+```         
+explanatory_data %>%  
+  mutate(    
+    intercept = ifelse(      
+      species =="Bream",      
+      intercept_bream,      
+      ifelse(        
+        species =="Perch",        
+        intercept_perch,        
+        ifelse(          
+          species =="Pike",          
+          intercept_pike,          
+          intercept_roach
+          )
+        )
+      )
+    )
+```
+
+### `case_when()`
+
+`dplyr` has a function called `case_when` that simplifies the code. Each argument to `case_when` is a formula, just like you use when specifying a model. On the left-hand side, you have a logical condition. On the right-hand side, you have the value to give to those rows where the condition is met. This is very abstract, so let's look at how we use it for predictions.
+
+```         
+dataframe %>% 
+    mutate(
+      case_when(
+        condition_1 ~ value_1,
+        condition_2 ~ value_2,
+        # ...
+        condition_n ~ value_n
+      )
+    )
+```
+
+### Choosing an intercept with `case_when()`
+
+The first argument to `case_when` has a logical condition to check for rows where the species is Bream. On the right-hand side of the formula, we give those rows the value of the bream intercept. Then we repeat this for the other species. This code does the same thing as the `ifelse` code, but I find it easier to write and to read.
+
+```         
+explanatory_data %>%  
+  mutate(    
+    intercept = case_when(      
+      species == "Bream" ~ intercept_bream,      
+      species == "Perch" ~ intercept_perch,      
+      species == "Pike" ~ intercept_pike,      
+      species == "Roach" ~ intercept_roach
+      )
+    )
+```
+
+### The final prediction step
+
+The final step is to calculate the response. As before, the response is the intercept plus the slope times the numeric explanatory variable. This time, the intercept is different for different rows.
+
+```{r}
+explanatory_data %>% 
+  mutate(
+    intercept = case_when(
+      species == "Bream" ~ intercept_bream,
+      species == "Perch" ~ intercept_perch,
+      species == "Pike" ~ intercept_pike,
+      species == "Roach" ~ intercept_roach
+    ),
+    mass_g = intercept + slope * length_cm
+  )
+```
+
+### Compare to `predict()`
+
+The model predicts some negative masses, which isn't a good sign. Let's check that we got the right answer by calling predict. You can see that the predictions are the same numbers as the mass column that we calculated, so our calculations are correct. It's just that this model performs poorly for small fish lengths.
+
+```{r}
+predict(mdl_mass_vs_both, explanatory_data)
+```
+
+## **Predicting with a parallel slopes model**
+
+While ggplot can automatically show you model predictions, in order to get those values to program with, you'll need to do the calculations yourself.
+
+Just as with the case of a single explanatory variable, the workflow has two steps: create a data frame of explanatory variables, then add a column of predictions. To make sure you've got the right answer, you can add your predictions to the ggplot with the `geom_parallel_slopes()` lines.
+
+`taiwan_real_estate` and `mdl_price_vs_both` are available; `dplyr`, `tidyr`, and `ggplot2` are loaded.
+
+**Instructions 1/3**
+
+Make a grid of explanatory data, formed from combinations of the following variables.
+
+-   `n_convenience` should take the numbers zero to ten.
+
+-   `house_age_years` should take the unique values of the `house_age_years` column of `taiwan_real_estate`.
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Make a grid of explanatory data
+explanatory_data <- expand_grid(
+  # Set n_convenience to zero to ten
+  n_convenience = 0:10,
+  # Set house_age_years to the unique values of that variable
+  house_age_years = unique(taiwan_real_estate$house_age_years)
+)
+
+# See the result
+explanatory_data
+```
+
+-   **2/3:** Add a column to the `explanatory_data` named for the response variable, assigning to `prediction_data`.
+
+-   The response column contain predictions made using `mdl_price_vs_both` and `explanatory_data`.
+
+```{r}
+# From previous step
+explanatory_data <- expand_grid(
+  n_convenience = 0:10,
+  house_age_years = unique(taiwan_real_estate$house_age_years)
+)
+
+# Add predictions to the data frame
+prediction_data <- explanatory_data %>% mutate(
+  proce_twd_msq = predict(mdl_price_vs_both, newdata = explanatory_data)
+)
+# See the result
+prediction_data
+```
+
+**3/3**
+
+-   Update the plot to add a point layer of predictions. Use the `prediction_data`, set the point size to 5, and the point shape to 15.
+
+```{r}
+# From previous steps
+explanatory_data <- expand_grid(
+  n_convenience = 0:10,
+  house_age_years = unique(taiwan_real_estate$house_age_years)
+)
+prediction_data <- explanatory_data %>% 
+  mutate(
+    price_twd_msq = predict(mdl_price_vs_both, explanatory_data)
+  )
+
+taiwan_real_estate %>% 
+  ggplot(aes(n_convenience, price_twd_msq, color = house_age_years)) +
+  geom_point() +
+  geom_parallel_slopes(se = FALSE) +
+  # Add points using prediction_data, with size 5 and shape 15
+  geom_point(
+    data = prediction_data,
+    size = 5,
+    shape = 15
+  )
+```
+
+## **Manually calculating predictions**
+
+As with simple linear regression, you can manually calculate the predictions from the model coefficients. The only change for the parallel slopes case is that the intercept is different for each category of the categorical explanatory variable. That means you need to consider the case when each each category occurs separately.
+
+`taiwan_real_estate`, `mdl_price_vs_both`, and `explanatory_data` are available; `dplyr` is loaded.
+
+**Instructions 1/2**
+
+-   Get the coefficients from `mdl_price_vs_both`, assigning to `coeffs`.
+
+-   Assign each of the elements of `coeffs` to the appropriate variable.
+
+```{r}
+# Get the coefficients from mdl_price_vs_both
+coeffs <- coefficients(mdl_price_vs_both)
+
+# Extract the slope coefficient
+slope <- coeffs[1]
+
+# Extract the intercept coefficient for 0 to 15
+intercept_0_15 <- coeffs[2]
+
+# Extract the intercept coefficient for 15 to 30
+intercept_15_30 <- coeffs[3]
+
+# Extract the intercept coefficient for 30 to 45
+intercept_30_45 <- coeffs[4]
+```
+
+**2/2**
+
+Add columns to `explanatory_data`.
+
+-   To choose the `intercept`, in the case when `house_age_years` is `"0 to 15"`, choose `intercept_0_15`. In the case when `house_age_years` is `"15 to 30"`, choose `intercept_15_30`. Do likewise for `"30 to 45"`.
+
+-   Manually calculate the predictions as the intercept plus the slope times `n_convenience`.
+
+```{r}
+# From previous step
+coeffs <- coefficients(mdl_price_vs_both)
+slope <- coeffs[1]
+intercept_0_15 <- coeffs[2]
+intercept_15_30 <- coeffs[3]
+intercept_30_45 <- coeffs[4]
+
+prediction_data <- explanatory_data %>% 
+  mutate(
+    # Consider the 3 cases to choose the intercept
+    intercept = case_when(
+      house_age_years == "0 to 15" ~ intercept_0_15,
+      house_age_years == "15 to 30" ~ intercept_15_30,
+      house_age_years == "30 to 45" ~ intercept_30_45
+    ),    
+    
+    # Manually calculate the predictions
+    price_twd_msq = intercept + slope * n_convenience
+  )
+
+# See the results
+prediction_data
+```
+
+## Video 1.3: Assessing Model Performance
+
+The big benefit of using more than one explanatory variable in a model is that you can sometimes get a better fit than when you use a single explanatory variable.
+
+### Model performance metrics
+
+-   *Coefficient of determination (R-squared)*: how well the linear regression fits the observed values.
+
+    -   Larger is better.
+
+-   *Residual Standard Error (RSE)*: the typical size of the residuals.
+
+    -   Smaller is better.
+
+In the last course, you saw two metrics for measuring model performance: the coefficient of determination, and the residual standard error. The coefficient of determination, sometimes known as the R-squared value, measures how good the regression's prediction line fits the observed values, and a larger number is better. The residual standard error, sometimes abbreviated to RSE, is - loosely speaking - the typical size of the residuals. Let's see if these metrics improve when both explanatory variables are included in the fish model.
+
+### Getting the coefficient of determination
+
+To easily get the coefficient of determination, load the `dplyr` and `broom` packages. Recall that `broom`'s `glance` function retrieves model-level metrics as a data frame. Then `dplyr`'s `pull` function can be used to extract the metric we want. The coefficient of determination is called `r.squared`. For the mass versus species model, the coefficient of determination is `0.72`, where `0` is the worst possible fit and `1` is a perfect fit. For the mass versus length model, the coefficient of determination is better, at `0.82`. For the mass versus both model, the coefficient of determination is even higher, at `0.97`. Using this metric, the model with both explanatory variables is the best one, since it has the highest coefficient of determination.
+
+```{r}
+library(dplyr)
+library(broom)
+```
+
+```{r}
+mdl_mass_vs_length %>% 
+  glance() %>% 
+  pull(r.squared)
+```
+
+```{r}
+mdl_mass_vs_species %>% 
+  glance() %>% 
+  pull(r.squared)
+```
+
+```{r}
+mdl_mass_vs_both %>% 
+  glance() %>% 
+  pull(r.squared)
+```
+
+### Adjusted coefficient of determination
+
+Adding more explanatory variables often increases the coefficient of determination for a model, but there is a problem. Including too many explanatory variables in your model can lead to a phenomenon called overfitting. That's when your model is optimized to provide the best fit for that particular dataset, but no longer reflects the general population. In this case, the model would be overfit if it performed well on this fish dataset, but badly on a different fish dataset. A variant metric called adjusted coefficient of determination includes a small penalty term for each additional explanatory variable to compensate for this effect. Its a better metric than the plain coefficient of determination. Its equation is based on the plain coefficient of determination, the number of observations, and the number of explanatory variables, including interactions. The penalty is big enough to worry about if the plain coefficient of determination is small, or if the number of explanatory variables is a sizable fraction of the number of observations. To get this metric, we retrieve the `adj.r.squared` element from the glanced model.
+
+-   More explanatory variables increases $R^2$.
+
+-   Too many explanatory variables causes **overfitting**.
+
+-   *Adjusted coefficient of determination* penalizes more explanatory variables.
+
+$$
+\bar{R}^2 = 1 - (1 - R^2)\frac{n_{obs} -1}{n_{obs}-n_{var}-1}
+$$
+
+-   Penalty is noticeable when $R^2$ is small or $n_{var}$ is a large fraction of $n_{obs}$.
+
+-   In `glance()`, it's the `adj.r.squared` element.
+
+### Getting the adjusted coefficient of determination
+
+To see the effect of penalization, let's look at the unadjusted and adjusted coefficients side-by-side. Since each model only contains one or two explanatory variables, the effect is tiny.
+
+```{r}
+library(dplyr)
+library(broom)
+```
+
+```{r}
+mdl_mass_vs_length %>% 
+  glance() %>% 
+  select(r.squared, adj.r.squared)
+```
+
+```{r}
+mdl_mass_vs_species %>% 
+  glance() %>% 
+  select(r.squared, adj.r.squared)
+```
+
+```{r}
+mdl_mass_vs_both %>% 
+  glance() %>% 
+  select(r.squared, adj.r.squared)
+```
+
+### Getting the Residual Standard Error
+
+The code to get the residual standard error is the same as before, but this time we pull out sigma. The mass versus species model has an RSE of just over three hundred. The mass versus length model has an RSE of about one hundred and fifty. Finally, the mass versus both model has an RSE of just over one hundred, meaning that it typically gets the mass wrong by about one hundred grams. Since that number is the lowest of the three, by this metric, the mass versus both model is best. That means that all metrics indicate that the model with two explanatory variables is better than the models with just one explanatory variable.
+
+```{r}
+library(dplyr)
+library(broom)
+```
+
+```{r}
+mdl_mass_vs_length %>% 
+  glance %>% 
+  pull(sigma)
+```
+
+```{r}
+mdl_mass_vs_species %>% 
+  glance %>% 
+  pull(sigma)
+```
+
+```{r}
+mdl_mass_vs_both %>% 
+  glance %>% 
+  pull(sigma)
+```
+
+## **Comparing coefficients of determination**
+
+Recall that the coefficient of determination is a measure of how well the linear regression line fits the observed values. An important motivation for including several explanatory variables in a linear regression is that you can improve the fit compared to considering only a single explanatory variable.
+
+Here you'll compare the coefficient of determination for the three Taiwan house price models, to see which gives the best result.
+
+`mdl_price_vs_conv`, `mdl_price_vs_age`, and `mdl_price_vs_both` are available; `dplyr` and `broom` are loaded.
+
+**Instructions 1/2**
+
+-   Get the unadjusted and adjusted coefficients of determination for `mdl_price_vs_conv` by glancing at the model, then selecting the `r.squared` and `adj.r.squared` values.
+
+-   Do the same for `mdl_price_vs_age` and `mdl_price_vs_both`.
+
+```{r}
+mdl_price_vs_conv %>% 
+  # Get the model-level coefficients
+  glance() %>% 
+  # Select the coeffs of determination
+  select(r.squared, adj.r.squared)
+
+# Get the coeffs of determination for mdl_price_vs_age
+mdl_price_vs_age %>% 
+  glance() %>% 
+  select(r.squared, adj.r.squared)
+
+# Get the coeffs of determination for mdl_price_vs_both
+mdl_price_vs_both %>% 
+  glance() %>% 
+  select(r.squared, adj.r.squared)
+```
+
+## **Comparing residual standard error**
+
+The other common metric for assessing model fit is the residual standard error (RSE), which measures the typical size of the residuals.
+
+In the last exercise you saw how including both explanatory variables into the model increased the coefficient of determination. How do you think using both explanatory variables will change the RSE?
+
+`mdl_price_vs_conv`, `mdl_price_vs_age`, and `mdl_price_vs_both` are available; `dplyr` and `broom` are loaded.
+
+**Instructions 1/2**
+
+-   Get the residual standard error for `mdl_price_vs_conv` by glancing at the model, then pulling the `sigma` value.
+
+-   Do the same for `mdl_price_vs_age`.
+
+-   Do the same for `mdl_price_vs_both`.
+
+```{r}
+mdl_price_vs_conv %>% 
+  # Get the model-level coefficients
+  glance() %>% 
+  # Pull out the RSE
+  pull(sigma)
+
+# Get the RSE for mdl_price_vs_age
+mdl_price_vs_age %>% 
+  glance() %>%
+  pull(sigma)
 
 
+# Get the RSE for mdl_price_vs_both
+mdl_price_vs_both %>% 
+  glance() %>%
+  pull(sigma)
+```
 
+`mdl_price_vs_both` gives the most accurate predictions.
 
+# Chapter 2: Interactions
 
+Explore the effect of interactions between explanatory variables. Considering interactions allows for more realistic models that can have better predictive power. You'll also deal with Simpson's Paradox: a non-intuitive result that arises when you have multiple explanatory variables.
 
+## Video 2.1: Models for each category
 
+### 4 categories
 
+```{r}
+unique(fish$species)
+```
 
+### Splitting the dataset
 
+**The smart way**
 
+-   base-R: `split()` + `lapply()`
+
+-   `dplyr`: `nest_by()` + `mutate()`
+
+**The simple way**
+
+```{r}
+bream <- fish %>%  
+    filter(species =="Bream")
+perch <- fish %>%  
+    filter(species =="Perch")
+pike <- fish %>%  
+    filter(species =="Pike")
+roach <- fish %>%  
+    filter(species =="Roach")
+```
+
+### 4 models
+
+```{r}
+mdl_bream <- lm(mass_g ~ length_cm, data = bream)
+mdl_bream
+```
+
+```{r}
+mdl_pike <- lm(mass_g ~ length_cm, data = pike)
+mdl_pike
+```
+
+```{r}
+mdl_perch <- lm(mass_g ~ length_cm, data = perch)
+mdl_perch
+```
+
+```{r}
+mdl_roach <- lm(mass_g ~ length_cm, data = roach)
+mdl_roach
+```
+
+### Explanatory data
+
+```{r}
+explanatory_data <- tibble(
+  length_cm = seq(5, 60, 5)
+)
+```
+
+### Making predictions
+
+```{r}
+prediction_data_bream <- explanatory_data %>%  
+  mutate(    
+    mass_g = predict(mdl_bream, explanatory_data),    
+    species ="Bream"
+    )
+```
+
+```{r}
+prediction_data_pike <- explanatory_data %>% 
+  mutate(
+    mass_g = predict(mdl_pike, explanatory_data),
+    species = "Pike"
+  )
+```
+
+```{r}
+prediction_data_perch <- explanatory_data %>% 
+  mutate(
+    mass_g = predict(mdl_perch, explanatory_data),
+    species = "Perch"
+  )
+```
+
+```{r}
+prediction_data_roach <- explanatory_data %>% 
+  mutate(
+    mass_g = predict(mdl_roach, explanatory_data),
+    species = "Roach"
+  )
+```
+
+### Visualizing predictions
+
+```{r}
+ggplot(fish, aes(length_cm, mass_g, color = species)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+### Adding in your predictions
+
+```{r}
+ggplot(fish, aes(length_cm, mass_g, color = species)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(data = prediction_data_bream, size = 3, shape = 15) +
+  geom_point(data = prediction_data_perch, size = 3, shape = 15) +
+  geom_point(data = prediction_data_pike, size = 3, shape = 15) +
+  geom_point(data = prediction_data_roach, size = 3, shape = 15)
+```
+
+### Coefficient of determination
+
+```{r}
+mdl_fish <- lm(mass_g ~ length_cm + species, data = fish)
+
+mdl_fish %>% 
+  glance() %>% 
+  pull(adj.r.squared)
+```
+
+```{r}
+mdl_bream %>% 
+  glance() %>% 
+  pull(adj.r.squared)
+```
+
+```{r}
+mdl_pike %>% 
+  glance() %>% 
+  pull(adj.r.squared)
+```
+
+```{r}
+mdl_roach %>% 
+  glance() %>% 
+  pull(adj.r.squared)
+```
+
+### Residual standard error
+
+```{r}
+mdl_fish %>% 
+  glance() %>% 
+  pull(sigma)
+```
+
+```{r}
+mdl_bream %>% 
+  glance() %>% 
+  pull(sigma)
+```
+
+```{r}
+mdl_pike %>% 
+  glance() %>% 
+  pull(sigma)
+```
+
+```{r}
+mdl_roach %>% 
+  glance() %>% 
+  pull(sigma)
+```
+
+## Video 2.2: One model with an interaction
+
+| Col1                                | Col2                           |
+|-------------------------------------|--------------------------------|
+| **No Interactions**                 | **No Interactions**            |
+| `response ~ explntry1 + explntry2`  | `mass_g ~ length_cm + species` |
+| **With interactions (explicit)**    |                                |
+|                                     |                                |
+|                                     |                                |
+|                                     |                                |
