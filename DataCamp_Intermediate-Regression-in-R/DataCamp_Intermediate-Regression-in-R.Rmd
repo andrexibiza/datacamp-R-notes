@@ -581,7 +581,7 @@ explanatory_data <- expand_grid(
 
 # Add predictions to the data frame
 prediction_data <- explanatory_data %>% mutate(
-  proce_twd_msq = predict(mdl_price_vs_both, newdata = explanatory_data)
+  price_twd_msq = predict(mdl_price_vs_both, newdata = explanatory_data)
 )
 # See the result
 prediction_data
@@ -1728,3 +1728,745 @@ ggplot(auctions, aes(openbid, price, color = auction_type)) +
     geom_point() +
     geom_smooth(method = "lm", se = FALSE)
 ```
+
+# Chapter 3: Multiple Linear Regression
+
+See how modeling, and linear regression in particular, makes it easy to work with more than two explanatory variables. Once you've mastered fitting linear regression models, you'll get to implement your own linear regression algorithm.
+
+## Video 3.1: Two numeric explanatory variables
+
+In the previous chapters, the models had one numeric and one categorical explanatory variable. Let's see what changes if you have two numeric explanatory variables instead.
+
+### Visualizing 3 numeric variables
+
+Two numeric explanatory variables plus a numeric response variable gives three numeric variables to plot. Since scatter plots are designed to show relationships between two numeric variables, it takes more thinking about. There are two common choices. Either we draw a 3D scatter plot, or a 2D scatter plot, using color for the response variable.
+
+-   3D scatter plot
+
+-   2D scatter plot with response as color
+
+### Another column for the fish dataset
+
+Let's revisit the fish dataset, which now has an extra numeric column, the height of the fish in centimeters.
+
+```{r}
+# `fish` data from https://www.kaggle.com/datasets/vipullrathod/fish-market
+# Filtering Kaggle data for species of interest to match course materials
+fish2 <- read_csv("data/fish.csv") %>%
+  select(Species, Weight, Length3, Height) %>%
+  rename(species = Species,
+         mass_g = Weight,
+         length_cm = Length3,
+         height_cm = Height) %>%
+  filter(species %in% c("Bream", "Roach", "Perch", "Pike"))
+fish2
+
+```
+
+### 3D scatter plot
+
+To make a 3D scatter plot, you can use `scatter3D` from the `plot3D` package. Unlike `ggplot`, this simply requires three numeric vectors for the x, y, and z coordinates. Writing the name of the dataset and using the dollar operator to access columns three times is tedious, so for code like this I prefer magrittr's dollar pipe. This code does the same thing, but is easier to write and read. The dollar pipe treats each of the arguments in the following function call as though they are columns in the data frame given to the left of the pipe.
+
+```{r}
+library(plot3D)
+scatter3D(fish2$length_cm, fish2$height_cm, fish2$mass_g)
+```
+
+The code is nicer now, but there is a bigger problem, namely that the plot is impossible to interpret. Some cleanup work like labeling axes can make things easier, but the fundamental problem is that screens are two dimensional, so 3D plots always suffer perspective issues. The only way to circumvent this is to create an interactive plot that the audience can rotate to explore the data from different angles. Maybe virtual reality will solve this one day, but for now let's move on to the next type of plot.
+
+### 2D scatter plot, color for response
+
+The next plot type to explore uses color for the response variable. This is a standard 2D scatter plot so we can use ggplot2. It's an improvement, but ggplot's default color scale doesn't make it easy to pick out differences in blues.
+
+```{r}
+ggplot(
+  fish2,
+  aes(length_cm, height_cm, color = mass_g)
+) +
+  geom_point()
+```
+
+### Viridis color scales
+
+ggplot has a set of color scales called "viridis" that provide easier to distinguish colors. `scale_color_viridis_c` is used for continuous scales, where you have numeric data. This plot uses the `"inferno"` palette option, which moves from black through blue and red to yellow. As you move up and to the right in the plot, the colors get brighter, representing heavier fish.
+
+```{r}
+ggplot(
+  fish2,
+  aes(length_cm, height_cm, color = mass_g)
+) +
+  geom_point() +
+  scale_color_viridis_c(option = "inferno")
+```
+
+### Modeling with 2 numeric explanatory variables
+
+Although plotting was harder with this extra explanatory variable, modeling isn't much different. The explanatory variables on the right of the formula are separated with a plus, as before. You get a global intercept coefficient, and one slope coefficient for each explanatory variable.
+
+```{r}
+mdl_mass_vs_both <- lm(mass_g ~ length_cm + height_cm, data = fish2)
+mdl_mass_vs_both
+```
+
+### The prediction flow
+
+The prediction flow is no different. Create a grid of explanatory values with expand_grid, then add a column of predictions with mutate and predict.
+
+```{r}
+explanatory_data <- expand_grid(
+  length_cm = seq(5, 60, 5),
+  height_cm = seq(2, 20, 2)
+)
+
+prediction_data <- explanatory_data %>% 
+  mutate(
+    mass_g = predict(mdl_mass_vs_both, explanatory_data)
+  )
+```
+
+### Plotting the predictions
+
+The plotting code also remains the same, though the results look different. The color grid gives a nice overview of how the response variable changes over the plane of the explanatory variables. The heaviest fish are in the top-right, where they are long and tall.
+
+```{r}
+ggplot(
+  fish2,
+  aes(length_cm, height_cm, color = mass_g)
+) +
+  geom_point() +
+  scale_color_viridis_c(option = "inferno") +
+  geom_point(
+    data = prediction_data, shape = 15, size = 3
+  )
+```
+
+### Including an interaction
+
+To include an interaction in the model, the only change is to replace the plus in the formula with a times. This gives you one extra slope term for the effect of the interaction between the two explanatory variables.
+
+```{r}
+mdl_mass_vs_both_inter <- lm(mass_g ~ length_cm * height_cm, data = fish2)
+mdl_mass_vs_both_inter
+```
+
+### The prediction flow again
+
+The prediction flow is exactly the same as before. Boring, but pleasingly easy.
+
+```{r}
+explanatory_data <- expand_grid(
+  length_cm = seq(5, 60, 5),
+  height_cm = seq(2, 20, 2)
+)
+
+prediction_data <- explanatory_data %>% 
+  mutate(
+    mass_g = predict(mdl_mass_vs_both_inter, explanatory_data)
+  )
+```
+
+### Plotting the predictions
+
+The plotting code is identical, but the colors on the plot are slightly different. In this case, the colors of the square prediction points closely match the colors of the nearby circular data points, which is a nice visual indicator that the model is a good fit.
+
+```{r}
+ggplot(
+  fish2,
+  aes(length_cm, height_cm, color = mass_g)
+) +
+  geom_point() +
+  scale_color_viridis_c(option = "inferno") +
+  geom_point(
+    data = prediction_data, shape = 15, size = 3
+  )
+```
+
+## **3D visualizations**
+
+Since computer screens and paper are both two-dimensional objects, most plots are best suited to visualizing two variables at once. For the case of three continuous variables, you can draw a 3D scatter plot, but perspective problems usually make it difficult to interpret. There are some "flat" alternatives that provide easier interpretation, though they require a little thinking about to make.
+
+`taiwan_real_estate` is available; `magrittr`, `plot3D` and `ggplot2` are loaded.
+
+**Instructions 1/2**
+
+-   With the `taiwan_real_estate` dataset, draw a 3D scatter plot of the number of nearby convenience stores on the x-axis, the **square-root** of the distance to the nearest MRT stop on the y-axis, and the house price on the z-axis.
+
+```{r}
+# With taiwan_real_estate, draw a 3D scatter plot of no. of conv. stores, sqrt dist to MRT, and price
+scatter3D(taiwan_real_estate$n_convenience, sqrt(taiwan_real_estate$dist_to_mrt_m), taiwan_real_estate$price_twd_msq)
+```
+
+**2/2**: With the `taiwan_real_estate` dataset, draw a scatter plot of the square-root of the distance to the nearest MRT stop versus the number of nearby convenience stores, colored by house price.
+
+-   Use the continuous viridis color scale, using the `"plasma"` option.
+
+```{r}
+# Using taiwan_real_estate, plot sqrt dist to MRT vs. no. of conv stores, colored by price
+ggplot(taiwan_real_estate, aes(n_convenience, sqrt(dist_to_mrt_m), color = price_twd_msq)) + 
+  # Make it a scatter plot
+  geom_point() +
+  # Use the continuous viridis plasma color scale
+  scale_color_viridis_c(option = "plasma")
+```
+
+## **Modeling 2 numeric explanatory variables**
+
+You already saw how to make a model and predictions with a numeric and a categorical explanatory variable. The code for modeling and predicting with two numeric explanatory variables in the same, other than a slight difference in how to specify the explanatory variables to make predictions against.
+
+Here you'll model and predict the house prices against the number of nearby convenience stores and the square-root of the distance to the nearest MRT station.
+
+`taiwan_real_estate` is available; `dplyr`, `tidyr` and `ggplot2` are loaded.
+
+**Instructions 1/3**
+
+-   Fit a linear regression of house price versus the number of convenience stores and the square-root of the distance to the nearest MRT stations, without an interaction, using the `taiwan_real_estate` dataset.
+
+```{r}
+# Fit a linear regression of price vs. no. of conv. stores and sqrt dist. to nearest MRT, no interaction
+mdl_price_vs_conv_dist <- lm(price_twd_msq ~ n_convenience + sqrt(dist_to_mrt_m), data = taiwan_real_estate)
+
+
+# See the result
+mdl_price_vs_conv_dist
+```
+
+**2/3**:
+
+-   Create expanded grid of explanatory variables with number of convenience stores from 0 to 10 and the distance to the nearest MRT station as a sequence from 0 to 80 in steps of 10, all squared (0, 100, 400, …, 6400). Assign to `explanatory_data`.
+
+<!-- -->
+
+-   Add a column of predictions to `explanatory_data` using `mdl_price_vs_conv_dist` and `explanatory_data`. Assign to `prediction_data`.
+
+```{r}
+# From previous step 
+mdl_price_vs_conv_dist <- lm(price_twd_msq ~ n_convenience + sqrt(dist_to_mrt_m), data = taiwan_real_estate)
+
+# Create expanded grid of explanatory variables with no. of conv. stores and  dist. to nearest MRT
+explanatory_data <- expand_grid(
+    n_convenience = 0:10,
+    dist_to_mrt_m = (seq(0, 80, 10))^2
+)
+
+# Add predictions using mdl_price_vs_conv_dist and explanatory_data
+prediction_data <- explanatory_data %>%
+    mutate(
+        price_twd_msq = predict(mdl_price_vs_conv_dist, explanatory_data)
+    )
+
+# See the result
+prediction_data
+```
+
+**3/3**: Extend the plot to add a layer of points using the prediction data, colored yellow, with size 3.
+
+```{r}
+# From previous steps
+mdl_price_vs_conv_dist <- lm(price_twd_msq ~ n_convenience + sqrt(dist_to_mrt_m), data = taiwan_real_estate)
+explanatory_data <- expand_grid(n_convenience = 0:10, dist_to_mrt_m = seq(0, 80, 10) ^ 2)
+prediction_data <- explanatory_data %>% 
+  mutate(price_twd_msq = predict(mdl_price_vs_conv_dist, explanatory_data))
+
+# Add predictions to plot
+ggplot(
+  taiwan_real_estate, 
+  aes(n_convenience, sqrt(dist_to_mrt_m), color = price_twd_msq)
+) + 
+  geom_point() +
+  scale_color_viridis_c(option = "plasma")+
+  # Add prediction points colored yellow, size 3
+  geom_point(data = prediction_data, color = "yellow", size = 3)
+```
+
+## **Including an interaction**
+
+Just as in the case with one numeric and one categorical explanatory variable, it is possible that numeric explanatory variables can interact. With this model structure, you'll get a third slope coefficient: one for each explanatory variable and one for the interaction.
+
+Here you'll run and predict the same model as in the previous exercise, but this time including an interaction between the explanatory variables.
+
+`taiwan_real_estate` is available; `dplyr`, `tidyr` and `ggplot2` are loaded.
+
+**Instructions 1/3**
+
+-   Fit a linear regression of house price versus the number of convenience stores and the square-root of the distance to the nearest MRT stations, *with* an interaction, using the `taiwan_real_estate` dataset.
+
+```{r}
+# Fit a linear regression of price vs. no. of conv. stores and sqrt dist. to nearest MRT, with interaction
+mdl_price_vs_conv_dist <- lm(price_twd_msq ~ n_convenience * sqrt(dist_to_mrt_m), data = taiwan_real_estate)
+
+# See the result
+mdl_price_vs_conv_dist
+```
+
+**2/3:**
+
+-   Create expanded grid of explanatory variables with number of convenience stores from 0 to 10 and the distance to the nearest MRT station as a sequence from 0 to 80 in steps of 10, all squared (0, 100, 400, …, 6400). Assign to `explanatory_data`.
+
+-   Add a column of predictions to `explanatory_data` using `mdl_price_vs_conv_dist` and `explanatory_data`. Assign to `prediction_data`.
+
+```{r}
+# From previous step 
+mdl_price_vs_conv_dist <- lm(price_twd_msq ~ n_convenience * sqrt(dist_to_mrt_m), data = taiwan_real_estate)
+
+# Create expanded grid of explanatory variables with no. of conv. stores and  dist. to nearest MRT
+explanatory_data <- expand_grid(
+    n_convenience = 0:10,
+    dist_to_mrt_m = seq(0, 80, 10)^2
+)
+
+# Add predictions using mdl_price_vs_conv_dist and explanatory_data
+prediction_data <- explanatory_data %>%
+    mutate(price_twd_msq = predict(mdl_price_vs_conv_dist, explanatory_data))
+
+# See the result
+prediction_data
+```
+
+**3/3**: Extend the plot to add a layer of points using the prediction data, colored yellow, with size 3.
+
+```{r}
+# From previous steps
+mdl_price_vs_conv_dist <- lm(price_twd_msq ~ n_convenience * sqrt(dist_to_mrt_m), data = taiwan_real_estate)
+explanatory_data <- expand_grid(n_convenience = 0:10, dist_to_mrt_m = seq(0, 80, 10) ^ 2)
+prediction_data <- explanatory_data %>% 
+  mutate(price_twd_msq = predict(mdl_price_vs_conv_dist, explanatory_data))
+
+# Add predictions to plot
+ggplot(
+  taiwan_real_estate, 
+  aes(n_convenience, sqrt(dist_to_mrt_m), color = price_twd_msq)
+) + 
+  geom_point() +
+  scale_color_viridis_c(option = "plasma") +
+  # Add prediction points colored yellow, size 3
+  geom_point(data = prediction_data, color = "yellow", size = 3)
+```
+
+## Video 3.2: More than 2 explanatory variables
+
+Regression models aren't limited to two explanatory variables. Here, we'll consider three of them, and think about what happens when you increase that number even further.
+
+### From last time
+
+In the last video you saw this scatter plot with the response variable, mass, indicated by color, and the explanatory variables shown on the x and y axes. You can see several distinct clusters of points. Perhaps these correspond to the different species of fish. We can check this by faceting on species.
+
+```{r}
+ggplot(
+  fish2,
+  aes(length_cm, height_cm, color = mass_g)
+) +
+  geom_point() +
+  scale_color_viridis_c(option = "inferno")
+```
+
+### Faceting by species
+
+Giving each species its own panel with facet_wrap makes the groups of data more easily apparent. There is a noticeable strong positive correlation between length and height for each species of fish. The relationship between the explanatory variables and the response is harder to quantify because you can't determine colors as accurately as x and y coordinates, but for each species you can see that as fish get longer and taller they also get heavier. In general, while it is tricky to include more than three numeric variables in a scatter plot, you can include as many categorical variables as you like using faceting. However, more facets can make it harder to see an overall picture. Plotting rapidly becomes difficult as you increase the number of variables to display.
+
+```{r}
+ggplot(
+  fish2,
+  aes(length_cm, height_cm, color = mass_g)
+) +
+  geom_point() +
+  scale_color_viridis_c(option = "inferno") +
+  facet_wrap(vars(species))
+```
+
+### Different levels of interaction
+
+By contrast, modeling doesn't get much harder as you increase the number of explanatory variables. Here, there are three explanatory variables and the only change is that you include an extra plus. The main tricky thing about including more explanatory variables in models is that there are more options regarding interactions. This model specifies no interactions between variables. You could also include 2-way, or "pairwise" interactions between the explanatory variables. A third option is to include a 3-way interaction between all the explanatory variables. This syntax quickly becomes cumbersome to type, so fortunately there are shortcuts.
+
+No interactions
+
+```         
+lm(mass_g ~ length_cm + height_cm + species +0, data = fish)
+```
+
+2-way interactions between pairs of variables
+
+```         
+lm(mass_g ~ length_cm + height_cm + species + length_cm:height_cm + length_cm:species + height_cm:species + 0,  data = fish)
+```
+
+3-way interaction between all three variables
+
+```         
+lm(  mass_g ~ length_cm + height_cm + species + length_cm:height_cm + length_cm:species + height_cm:species + length_cm:height_cm:species +0,  data = fish)
+```
+
+### All the interactions
+
+You've already seen the concise syntax for including all the interactions. Simply swap the plus operators for times symbols. Both these formulas mean the same thing. You still need a plus before the zero to denote not including a global intercept term.
+
+```{r}
+lm(
+  mass_g ~ length_cm * height_cm * species + 0,
+  data = fish2
+)
+```
+
+### Only 2-way interactions
+
+To get only 2-way interactions in the model, but not the 3-way interaction, you can use a new syntax, namely wrapping the explanatory variables in parentheses and raising them to the power of two.
+
+```         
+lm(
+  mass_g ~ (length_cm + height_cm + species) ^ 2 + 0,
+  data = fish
+)
+```
+
+Here, the power of operator has a special meaning; it doesn't square the explanatory variable values. To do that, you need to wrap the terms in the `I` function, like you saw in the previous course.
+
+```         
+lm(
+  mass_g ~ I(length_cm) ^ 2 + height_cm + species + 0
+)
+```
+
+### The prediction flow
+
+The prediction flow with an extra variable contains no surprises. This is exactly what you've seen before. Modeling code scales nicely with more variables.
+
+```{r}
+mdl_mass_vs_all <- lm(mass_g ~ length_cm * height_cm * species * 0, data = fish2)
+
+explanatory_data <- expand_grid(
+  length_cm = seq(5, 60, 6),
+  height_cm = seq(2, 20, 2),
+  species = unique(fish2$species)
+)
+
+prediction_data <- explanatory_data %>% 
+  mutate(mass_g = predict(mdl_mass_vs_all, explanatory_data))
+```
+
+### Visualizing predictions
+
+Likewise, the plotting code is the same as before. The colors of the square prediction points are similar to the colors of the nearby circular data points, indicating that the model provides a good fit.
+
+```{r}
+ggplot(
+  fish2,
+  aes(length_cm, height_cm, color = mass_g)
+) + 
+  geom_point() +
+  scale_color_viridis_c(option = "inferno") +
+  facet_wrap(vars(species)) +
+  geom_point(
+    data = prediction_data,
+    size = 3, shape = 15
+  )
+```
+
+## **Visualizing many variables**
+
+As you begin to consider more variables, plotting them all at the same time becomes increasingly difficult. In addition to using x and y scales for two numeric variables, you can use color for a third numeric variable, and you can use faceting for categorical variables. And that's about your limit before the plots become to difficult to interpret. There are some specialist plot types like correlation heatmaps and parallel coordinates plots that will handle more variables, but they give you much less information about each variable, and they aren't great for visualizing model predictions.
+
+Here you'll push the limits of the scatter plot by showing the house price, the distance to the MRT station, the number of nearby convenience stores, and the house age, all together in one plot.
+
+`taiwan_real_estate` is available; `ggplot2` is loaded.
+
+**Instructions**
+
+-   Using the `taiwan_real_estate` dataset, draw a scatter plot of `n_convenience` versus the square root of `dist_to_mrt_m`, colored by `price_twd_msq`.
+
+-   Use the continuous viridis plasma color scale.
+
+-   Facet the plot, wrapping by `house_age_years`.
+
+```{r}
+# Using taiwan_real_estate, no. of conv. stores vs. sqrt of dist. to MRT, colored by plot house price
+ggplot(taiwan_real_estate, aes(sqrt(dist_to_mrt_m), n_convenience, color = price_twd_msq)) +
+  # Make it a scatter plot
+  geom_point() +
+  # Use the continuous viridis plasma color scale
+  scale_color_viridis_c(option = "plasma") +
+  # Facet, wrapped by house age
+  facet_wrap(vars(house_age_years))
+```
+
+## **Different levels of interaction**
+
+Once you have three explanatory variables, the number of options for specifying interactions increases. You can specify no interactions. You can specify 2-way interactions, which gives you model coefficients for each pair of variables. The third option is to specify all the interactions, which means the three 2-way interactions and and interaction between all three explanatory variables.
+
+As the number of explanatory variables increases further, the number of interaction possibilities rapidly increases.
+
+`taiwan_real_estate` is available.
+
+**Instructions 1/3**
+
+-   Fit a linear regression of house price versus `n_convenience`, the square-root of `dist_to_mrt_m`, and `house_age_years`. Don't include a global intercept, and don't include any interactions.
+
+```{r}
+# Model price vs. no. of conv. stores, sqrt dist. to MRT station & house age, no global intercept, no interactions
+mdl_price_vs_all_no_inter <- lm(price_twd_msq ~ n_convenience + sqrt(dist_to_mrt_m) + house_age_years + 0, data = taiwan_real_estate)
+
+# See the result
+mdl_price_vs_all_no_inter
+```
+
+**2/3:**
+
+Fit a linear regression of house price versus the square-root of `dist_to_mrt_m`, `n_convenience`, and `house_age_years`. Don't include a global intercept, but do include 2-way and 3-way interactions between the explanatory variables.
+
+```{r}
+# Model price vs. sqrt dist. to MRT station, no. of conv. stores & house age, no global intercept, 3-way interactions
+mdl_price_vs_all_3_way_inter <- lm(price_twd_msq ~ sqrt(dist_to_mrt_m) * n_convenience * house_age_years + 0, data = taiwan_real_estate)
+
+# See the result
+mdl_price_vs_all_3_way_inter
+```
+
+**3/3**
+
+Fit a linear regression of house price versus the square-root of `dist_to_mrt_m`, `n_convenience`, and `house_age_years`. Don't include a global intercept, but do include 2-way (not 3-way) interactions between the explanatory variables.
+
+```{r}
+# Model price vs. sqrt dist. to MRT station, no. of conv. stores & house age, no global intercept, 2-way interactions
+mdl_price_vs_all_2_way_inter <- lm(price_twd_msq ~ (sqrt(dist_to_mrt_m) + n_convenience + house_age_years) ^ 2 + 0, data = taiwan_real_estate)
+
+# See the result
+mdl_price_vs_all_2_way_inter
+```
+
+## **Predicting again**
+
+You've followed the prediction workflow several times now with different combinations of explanatory variables. Time to try it once more on the model with three explanatory variables. Here, you'll use the model with 3-way interactions, though the code is the same when using any of the three models from the previous exercise.
+
+`taiwan_real_estate` and `mdl_price_vs_all_3_way_inter` are available; `dplyr`, `tidyr` and `ggplot2` are loaded.
+
+**Instructions 1/3**
+
+Make a grid of explanatory data, formed from combinations of the following variables.
+
+-   `dist_to_mrt_m` should take a sequence from zero to eighty in steps of ten, all squared (0, 100, 400, …, 6400).
+
+-   `n_convenience` should take the numbers zero to ten.
+
+-   `house_age_years` should take the unique values of the `house_age_years` column of `taiwan_real_estate`.
+
+```{r}
+# Make a grid of explanatory data
+explanatory_data <- expand_grid(
+  # Set dist_to_mrt_m a seq from 0 to 80 by 10s, squared
+  dist_to_mrt_m = (seq(0, 80, 10))^2,
+  # Set n_convenience to 0 to 10
+  n_convenience = 0:10,
+  # Set house_age_years to the unique values of that variable
+  house_age_years = unique(taiwan_real_estate$house_age_years)
+)
+
+# See the result
+explanatory_data
+```
+
+**2/3**
+
+-   Add a column to the `explanatory_data`, assigning to `prediction_data`.
+
+-   The column should be named after the response variable, and contain predictions made using `mdl_price_vs_all_3_way_inter` and `explanatory_data`.
+
+```{r}
+# From previous step
+explanatory_data <- expand_grid(
+  dist_to_mrt_m = seq(0, 80, 10) ^ 2,
+  n_convenience = 0:10,
+  house_age_years = unique(taiwan_real_estate$house_age_years)
+)
+
+# Add predictions to the data frame
+prediction_data <- explanatory_data %>%
+  mutate(price_twd_msq = predict(mdl_price_vs_all_3_way_inter, explanatory_data))
+
+# See the result
+prediction_data
+```
+
+**3/3** Extend the plot to include predictions as points from `prediction_data`, with size 3 and shape 15.
+
+-   *Look at the plot. What do the prediction points tell you?*
+
+```{r}
+# From previous step
+explanatory_data <- expand_grid(
+  dist_to_mrt_m = seq(0, 80, 10) ^ 2,
+  n_convenience = 0:10,
+  house_age_years = unique(taiwan_real_estate$house_age_years)
+)
+prediction_data <- explanatory_data %>% 
+  mutate(price_twd_msq = predict(mdl_price_vs_all_3_way_inter, explanatory_data))
+
+# Extend the plot
+ggplot(
+  taiwan_real_estate, 
+  aes(sqrt(dist_to_mrt_m), n_convenience, color = price_twd_msq)
+) +
+  geom_point() +
+  scale_color_viridis_c(option = "plasma") +
+  facet_wrap(vars(house_age_years)) +
+  # Add points from prediction data, size 3, shape 15
+  geom_point(data = prediction_data, size = 3, shape = 15)
+```
+
+## Video 3.3: How linear regression works
+
+-   The simplest idea (which doesn't work): take the sum of all the residuals.
+
+    -   Some residuals are negative.
+
+-   The next simplest idea (which does work)
+
+    -   Take the square of each residual and add up those squares.
+
+### `optim()`
+
+```{r}
+calc_guadratic <- function(x) {
+  x ^ 2 - x + 10
+}
+```
+
+```{r}
+optim(par = 3, fn = calc_guadratic)
+```
+
+### Slight refinements
+
+There are two changes to the code which aren't needed here but will assist us in the linear regression case. The function passed to `optim` is only allowed to have one argument, so to optimize for multiple variables, you need to pass them as a numeric vector. Here, `calc_quadratic` takes a numeric vector called `coeffs`, then extracts the first element and calls it `x`. Secondly, passing a named vector as the initial guess to the `par` argument of `optim` makes the output easier to read. Now the par element in the output is named `"x"`.
+
+```{r}
+calc_quadratic <- function(coeffs) {
+  x <- coeffs[1]
+  x ^ 2 - x + 10
+}
+```
+
+### A linear regression algorithm
+
+1.  Define a function to calculate the sum of squares metric.
+
+```{r}
+calc_sum_of_Squares <- function(coeffs) {
+  intercept <- coeffs[1]
+  slope <- coeffs[2]
+}
+```
+
+2.  Call `optim()` to find coefficients that minimize this function.
+
+```         
+optim(
+  par = ???,
+  fn = ???
+)
+```
+
+## **Linear regression algorithm**
+
+To truly understand linear regression, it is helpful to know how the algorithm works. The code for `lm()` is hundreds of lines because it has to work with any formula and any dataset. However, in the case of simple linear regression for a single dataset, you can implement a linear regression algorithm in just a few lines of code.
+
+The workflow is
+
+1.  Write a script to calculate the sum of squares.
+
+2.  Turn this into a function.
+
+3.  Use R's general purpose optimization function find the coefficients that minimize this.
+
+The explanatory values (the `n_convenience` column of `taiwan_real_estate`) are available as `x_actual`. The response values (the `price_twd_msq` column of `taiwan_real_estate`) are available as `y_actual`.
+
+**Instructions 1/3**
+
+-   Set the intercept to ten.
+
+-   Set the slope to one.
+
+-   Calculate the predicted y-values as the intercept plus the slope times the actual x-values.
+
+-   Calculate the differences between actual and predicted y-values.
+
+-   Calculate the sum of squares. Get the sum of the differences in y-values, squaring each value.
+
+```{r}
+# Set the intercept to 10
+intercept <- 10
+
+# Set the slope to 1
+slope <- 1
+
+# Calculate the predicted y values
+y_pred <- intercept + slope * x_actual
+
+# Calculate the differences between actual and predicted
+y_diff <- y_actual - y_pred
+
+# Calculate the sum of squares
+sum(y_diff ^ 2)
+```
+
+**2/3**
+
+Complete the function body.
+
+-   Get the intercept from the first element of `coeffs`.
+
+-   Get the slope from the second element of `coeffs`.
+
+-   Calculate the predicted y-values as the intercept plus the slope times the actual x-values.
+
+-   Calculate the differences between actual and predicted y-values.
+
+-   Calculate the sum of squares. Get the sum of the differences in y-values, squaring each value.
+
+```{r}
+calc_sum_of_squares <- function(coeffs) {
+  # Get the intercept coeff
+  intercept <- coeffs[1]
+
+  # Get the slope coeff
+  slope <- coeffs[2]
+
+  # Calculate the predicted y values
+  y_pred <- intercept + slope * x_actual
+
+  # Calculate the differences between actual and predicted
+  y_diff <- y_actual - y_pred
+
+  # Calculate the sum of squares
+  sum(y_diff ^ 2)
+}
+```
+
+**3/3**: Optimize the sum of squares metric.
+
+-   Call an optimization function.
+
+-   Initially guess that the intercept is zero and the slope is zero by passing a named vector of parameters.
+
+-   Use `calc_sum_of_squares` as the optimization function.
+
+```{r}
+# # From previous step
+# calc_sum_of_squares <- function(coeffs) {
+#   intercept <- coeffs[1]
+#   slope <- coeffs[2]
+#   y_pred <- intercept + slope * x_actual
+#   y_diff <- y_actual - y_pred
+#   sum(y_diff ^ 2)
+# }
+# 
+# # Optimize the metric
+# optim(
+#   # Initially guess 0 intercept and 0 slope
+#   par = c("intercept" = 0, "slope" = 0), 
+#   # Use calc_sum_of_squares as the optimization fn
+#   fn = calc_sum_of_squares
+# )
+# 
+# # Compare the coefficients to those calculated by lm()
+# lm(price_twd_msq ~ n_convenience, data = taiwan_real_estate)
+```
+
+# Chapter 4: Multiple Logistic Regression
