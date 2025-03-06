@@ -111,6 +111,37 @@ fish
 
 ```
 
+### `simpsons_paradox`
+
+For video 2.4, we need a dataset called `simpsons_paradox`, which is no longer directly available through CRAN for R version 4.4.2. We can simulate this data using the `simulate_simpson` function from the `bayestestR` package. To Install the package, run `install.packages("bayestestR")`.
+
+```{r}
+library(bayestestR)
+simpsons_paradox <- simulate_simpson(
+  n = 100,
+  r = 0.5,
+  groups = 5,
+  difference = 1,
+  group_prefix = ""
+) %>% 
+  rename(
+    x = V1,
+    y = V2,
+    group = Group
+  ) %>% 
+  mutate(group = recode(group, 
+                        `1` = "A", 
+                        `2` = "B", 
+                        `3` = "C", 
+                        `4` = "D", 
+                        `5` = "E")
+         )
+```
+
+```{r}
+head(simpsons_paradox)
+```
+
 Now we are ready to begin Chapter 1!
 
 # Chapter 1: Parallel Slopes
@@ -215,7 +246,7 @@ The case when there is one numeric explanatory variable and one categorical expl
 Here, you'll revisit the Taiwan real estate dataset. Recall the meaning of each variable.
 
 | Variable | Meaning |
-|:---|:---|
+|:-----------------------------------|:-----------------------------------|
 | `dist_to_mrt_station_m` | Distance to nearest MRT metro station, in meters. |
 | `n_convenience` | No. of convenience stores in walking distance. |
 | `house_age_years` | The age of the house, in years, in 3 groups. |
@@ -835,13 +866,19 @@ Explore the effect of interactions between explanatory variables. Considering in
 
 ## Video 2.1: Models for each category
 
+The parallel slopes model enforced a common slope for each category. That's not always the best option.
+
 ### 4 categories
+
+Recall that the fish dataset had four different species of fish. One way to give each species a different slope is to run a separate model for each of these.
 
 ```{r}
 unique(fish$species)
 ```
 
 ### Splitting the dataset
+
+There are many smart ways of splitting a dataset into parts and computing on each part. In base-R, you can use `split` and `lapply`. In `dplyr`, you can use `nest_by` and `mutate`. We aren't going to do that. Instead, let's `filter` for each species one at a time and assign the result to individual variables. I'm choosing this approach partly because I don't want fancy code to get in the way of reasoning about models, and partly because **running regression models is such a fundamental task that you need to be able to write the code without thinking, and that takes practice.** With this approach, you'll be writing the modeling code for every category in the dataset.
 
 **The smart way**
 
@@ -863,6 +900,8 @@ roach <- fish %>%
 ```
 
 ### 4 models
+
+Now we have four datasets, we can run four models. Again, there's no fancy looping, just the same model four times. Observe that each model gives a different intercept and a different slope.
 
 ```{r}
 mdl_bream <- lm(mass_g ~ length_cm, data = bream)
@@ -886,6 +925,8 @@ mdl_roach
 
 ### Explanatory data
 
+To make predictions with these models, we first have to create a data frame of explanatory variables. The good news is that since each model has the same explanatory variable, you only have to write this code once. Give your copy and paste fingers a rest.
+
 ```{r}
 explanatory_data <- tibble(
   length_cm = seq(5, 60, 5)
@@ -893,6 +934,8 @@ explanatory_data <- tibble(
 ```
 
 ### Making predictions
+
+Predicting follows the now familiar flow. Add a column with `mutate`, name it after the response variable, call `predict` with the model and the explanatory data. The only difference in each case is the `model` variable. It isn't necessary for calculating the predictions, but to make the plotting code you are about to see easier, I've also included the species in each prediction dataset.
 
 ```{r}
 prediction_data_bream <- explanatory_data %>%  
@@ -928,6 +971,8 @@ prediction_data_roach <- explanatory_data %>%
 
 ### Visualizing predictions
 
+Here's the standard `ggplot` for showing linear regression predictions. `geom_point` makes it a scatter plot, and `geom_smooth` with `method = "lm"` provides prediction lines. Unlike the parallel slopes case, each line has its own slope. This is achieved by setting the color aesthetic.
+
 ```{r}
 ggplot(fish, aes(length_cm, mass_g, color = species)) +
   geom_point() +
@@ -935,6 +980,8 @@ ggplot(fish, aes(length_cm, mass_g, color = species)) +
 ```
 
 ### Adding in your predictions
+
+To sanity check our predictions, we add them to the plot to see if they align with what `ggplot2` calculated. The size and shape are changed to help them stand out. Thankfully, each line of squares follows `ggplot`'s trend lines.
 
 ```{r}
 ggplot(fish, aes(length_cm, mass_g, color = species)) +
@@ -947,6 +994,8 @@ ggplot(fish, aes(length_cm, mass_g, color = species)) +
 ```
 
 ### Coefficient of determination
+
+An important question here is **are these models better**? The coefficient of determination for a model on the whole `fish` dataset is `0.92`. Now here's the coefficient of determination for each of the individual models. The pike number is higher, indicating a better fit, though the numbers for the other models are lower.
 
 ```{r}
 mdl_fish <- lm(mass_g ~ length_cm + species, data = fish)
@@ -976,6 +1025,8 @@ mdl_roach %>%
 
 ### Residual standard error
 
+Here's the residual standard error for the whole dataset model, one hundred and three. For the individual models, this time the pike residual standard error is higher, indicating larger differences between actual and predicted values, but the other models show an improvement over the whole dataset model. This mixed performance result is quite common: the whole dataset model benefits from the increased power of more rows of data, whereas individual models benefit from not having to satisfy differing components of data.
+
 ```{r}
 mdl_fish %>% 
   glance() %>% 
@@ -1000,13 +1051,680 @@ mdl_roach %>%
   pull(sigma)
 ```
 
+## **One model per category**
+
+The model you ran on the whole dataset fits some parts of the data better than others. It's worth taking a look at what happens when you run a linear model on different parts of the dataset separately, to see if each model agrees or disagrees with the others.
+
+`taiwan_real_estate` is available; `dplyr` is loaded.
+
+**Instructions 1/2**
+
+-   Filter `taiwan_real_estate` for rows where `house_age_years` is `"0 to 15"`, assigning to `taiwan_0_to_15`.
+
+-   Repeat this for the `"15 to 30"` and `"30 to 45"` house age categories.
+
+```{r}
+# Filter for rows where house age is 0 to 15 years
+taiwan_0_to_15 <- taiwan_real_estate %>% 
+    filter(house_age_years == "0 to 15")
+
+# Filter for rows where house age is 15 to 30 years
+taiwan_15_to_30 <- taiwan_real_estate %>% 
+    filter(house_age_years == "15 to 30")
+
+# Filter for rows where house age is 30 to 45 years
+taiwan_30_to_45 <- taiwan_real_estate %>% 
+    filter(house_age_years == "30 to 45")
+```
+
+**2/2**
+
+-   Run a linear regression of `price_twd_msq` versus `n_convenience` using the `taiwan_0_to_15` dataset.
+
+-   Repeat this for `taiwan_15_to_30` and `taiwan_30_to_45`.
+
+```{r}
+# Model price vs. no. convenience stores using 0 to 15 data
+mdl_0_to_15 <- lm(price_twd_msq ~ n_convenience, data = taiwan_0_to_15)
+
+# Model price vs. no. convenience stores using 15 to 30 data
+mdl_15_to_30 <- lm(price_twd_msq ~ n_convenience, data = taiwan_15_to_30)
+
+# Model price vs. no. convenience stores using 30 to 45 data
+mdl_30_to_45 <- lm(price_twd_msq ~ n_convenience, data = taiwan_30_to_45)
+
+# See the results
+mdl_0_to_15
+mdl_15_to_30
+mdl_30_to_45
+```
+
+## **Predicting multiple models**
+
+In order to see what each of the models for individual categories are doing, it's helpful to make predictions from them. The flow is exactly the same as the flow for making predictions on the whole model, though remember that you only have a single explanatory variable in these models (so `expand_grid()` isn't needed.)
+
+The models `mdl_0_to_15`, `mdl_15_to_30` and `mdl_30_to_45` are available; `dplyr` is loaded.
+
+**Instructions 1/2**
+
+-   Create a tibble of explanatory data, setting `n_convenience` to a vector from zero to ten, assigning to `explanatory_data_0_to_15`.
+
+```{r}
+explanatory_data <- tibble(
+  n_convenience = 0:10
+)
+```
+
+**2/2**
+
+-   Add a column of predictions named `price_twd_msq` to `explanatory_data`, using `mdl_0_to_15` and `explanatory_data`. Assign to `prediction_data_0_to_15`.
+
+-   Repeat this for the 15 to 30 year and 30 to 45 year house age categories.
+
+```{r}
+# Add column of predictions using "0 to 15" model and explanatory data 
+prediction_data_0_to_15 <- explanatory_data %>% 
+  mutate(price_twd_msq = predict(mdl_0_to_15, newdata = explanatory_data))
+
+# Same again, with "15 to 30"
+prediction_data_15_to_30 <- explanatory_data %>% 
+  mutate(price_twd_msq = predict(mdl_15_to_30, newdata = explanatory_data))
+
+# Same again, with "30 to 45"
+prediction_data_30_to_45 <- explanatory_data %>% 
+  mutate(price_twd_msq = predict(mdl_30_to_45, newdata = explanatory_data))
+```
+
+## **Visualizing multiple models**
+
+In the last two exercises, you ran models for each category of house ages separately, then calculated predictions for each model. Now it's time to visualize those predictions to see how they compare.
+
+When you use `geom_smooth()` in a ggplot with an aesthetic that splits the dataset into groups and draws a line for each group (like the `color` aesthetic), you get multiple trend lines. This is the same as running a model on each group separately, so we get a chance to test our predictions against ggplot's.
+
+`taiwan_real_estate`, `prediction_data_0_to_15`, `prediction_data_15_to_30`, and `prediction_data_30_to_45` are available; `ggplot2` is loaded.
+
+**Instructions 1/2**
+
+-   Using `taiwan_real_estate`, plot `price_twd_msq` versus `n_convenience` colored by `house_age_years`.
+
+-   Add a point layer.
+
+-   Add smooth trend lines for each color using the linear regression method and turning off the standard error ribbon.
+
+```{r}
+# Using taiwan_real_estate, plot price vs. no. of conv. stores colored by house age
+ggplot(taiwan_real_estate, aes(n_convenience, price_twd_msq, color = house_age_years)) +
+  # Make it a scatter plot
+  geom_point() +
+  # Add smooth linear regression trend lines, no ribbon
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+**2/2**:
+
+-   Extend the plot by adding the prediction points from `prediction_data_0_to_15`. Color them red, with size 3 and shape 15.
+
+-   Add prediction points from `prediction_data_15_to_30`, colored green, size 3, and shape 15.
+
+-   Add prediction points from `prediction_data_30_to_45`, colored blue, size 3, and shape 15.
+
+```{r}
+# Extend the plot to include prediction points
+ggplot(taiwan_real_estate, aes(n_convenience, price_twd_msq, color = house_age_years)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  # Add points using prediction_data_0_to_15, colored red, size 3, shape 15
+  geom_point(data = prediction_data_0_to_15, color = "red", size = 3, shape = 15) +
+  # Add points using prediction_data_15_to_30, colored green, size 3, shape 15
+  geom_point(data = prediction_data_15_to_30, color = "green", size = 3, shape = 15) +
+  # Add points using prediction_data_30_to_45, colored blue, size 3, shape 15
+  geom_point(data = prediction_data_30_to_45, color = "blue", size = 3, shape = 15)
+```
+
+## **Assessing model performance**
+
+To test which approach is best—the whole dataset model or the models for each house age category—you need to calculate some metrics. Here's, you'll compare the coefficient of determination and the residual standard error for each model.
+
+Four models of price versus no. of convenience stores (`mdl_all_ages`, `mdl_0_to_15`, `mdl_15_to_30`, and `mdl_30_to_45`) are available; `dplyr` and `broom` are loaded.
+
+**Instructions 1/2**
+
+-   Get the coefficient of determination for `mdl_all_ages`, `mdl_0_to_15`, `mdl_15_to_30`, and `mdl_30_to_45`.
+
+```{r}
+mdl_all_ages <- lm(price_twd_msq ~ n_convenience, data = taiwan_real_estate)
+
+# Get the coeff. of determination for mdl_all_ages
+mdl_all_ages %>%
+    glance() %>%
+    pull(r.squared)
+
+# Get the coeff. of determination for mdl_0_to_15
+mdl_0_to_15 %>%
+    glance() %>%
+    pull(r.squared)
+
+# Get the coeff. of determination for mdl_15_to_30
+mdl_15_to_30 %>%
+    glance() %>% 
+    pull(r.squared)
+
+# Get the coeff. of determination for mdl_30_to_45
+mdl_30_to_45 %>%
+    glance() %>%
+    pull(r.squared)
+```
+
+**2/2:** Get the residual standard error for `mdl_all_ages`, `mdl_0_to_15`, `mdl_15_to_30`, and `mdl_30_to_45`.
+
+```{r}
+# Get the RSE for mdl_all
+mdl_all_ages %>%
+    glance() %>%
+    pull(sigma)
+
+# Get the RSE for mdl_0_to_15
+mdl_0_to_15 %>%
+    glance() %>%
+    pull(sigma)
+
+# Get the RSE for mdl_15_to_30
+mdl_15_to_30 %>%
+    glance() %>%
+    pull(sigma)
+
+# Get the RSE for mdl_30_to_45
+mdl_30_to_45 %>%
+    glance() %>%
+    pull(sigma)
+```
+
 ## Video 2.2: One model with an interaction
 
-| Col1                                | Col2                           |
-|-------------------------------------|--------------------------------|
-| **No Interactions**                 | **No Interactions**            |
-| `response ~ explntry1 + explntry2`  | `mass_g ~ length_cm + species` |
-| **With interactions (explicit)**    |                                |
-|                                     |                                |
-|                                     |                                |
-|                                     |                                |
+Messing about with different models for different bits of your dataset is a pain. A better solution is to specify a single model that contains intercepts and slopes for each category. This is achieved through specifying interactions between explanatory variables.
+
+### What is an interaction?
+
+To understand the idea of interactions between explanatory variables, consider what we know about the fish dataset. Different fish species have different mass to length ratios. In statistical terms, we can say that the effect that length has on the expected mass of the fish varies between species. That means that length and species interact. More generally, if the effect of one explanatory variable on the expected response has different values dependent on the values of another explanatory variable, then those two explanatory variables interact.
+
+> **In the fish dataset**
+>
+> The effect of length on the expected mass is different for different species.
+>
+> **More generally**
+>
+> The effect of one explanatory variable on the expected response changes depending on the value of another explanatory variable.
+
+### Specifying interactions
+
+You've seen how to include multiple explanatory variables in a formula using plus, for example, length plus species. To include an interaction between those variables, you simply swap the plus for a times. I've called this syntax implicit because you didn't write down what interactions are needed - R figures that out itself. Usually this concise syntax is best, but occasionally you may wish to explicitly document which interactions are included in the model. The explicit syntax is to add each explanatory variable separated by plus then add a third term with both explanatory variables separated by a colon. The result is exactly the same, so choosing a syntax depends on personal preference: do you like brevity or detail?
+
+|  |  |
+|----|----|
+| **No Interactions** | **No Interactions** |
+| `response ~ explntry1 + explntry2` | `mass_g ~ length_cm + species` |
+| **With interactions (implicit)** | **With interactions (implicit)** |
+| `response_var ~ explntry1 * explntry2` | `mass_g ~ length_cm * species` |
+| **With interactions (explicit)** | **With interactions (explicit)** |
+| `response ~ explntry1 + explntry2 + explntry1:explntry2` | `mass_g ~ length_cm + species + length_cm:species` |
+
+### Running the model
+
+Here's the formula in a model, and there are eight coefficients. As you saw in the models with a categorical explanatory variable, the coefficients are tricky to understand. The (Intercept) coefficient is the intercept for the first species, namely bream. The length coefficient is the slope for the bream. Then the (Intercept) coefficient plus the speciesPerch coefficient is the intercept for perch. And the length coefficient plus the length-speciesPerch coefficient is the slope for perch. It's a mess.
+
+```{r}
+lm(mass_g ~ length_cm * species, data = fish)
+```
+
+### Easier to understand coefficients
+
+Ironically, to get easier to understand coefficients, we need to make the formula harder to read. This is the same model specified differently. On the right-hand side of the formula, you can see the categorical explanatory variable, species, then an interaction between the two explanatory variables, then zero to remove the global intercept. Now we get an intercept coefficient for each species shown on the top row, and a slope coefficient for each species shown on the bottom row.
+
+```{r}
+mdl_inter <- lm(mass_g ~ species + species:length_cm + 0, data = fish)
+mdl_inter
+```
+
+### Familiar numbers
+
+You've seen all these coefficient values before. If we examine the coefficients from the model on the bream data from the previous video, you can see that the intercept and slope are the same as in the model we just made. The same is true for the other three species. In fact, the model with the interaction is effectively the same as fitting separate models for each category, only you get the convenience of not having to manage four sets of code.
+
+```{r}
+coefficients(mdl_bream)
+```
+
+## **Specifying an interaction**
+
+So far you used a single parallel slopes model, which gave an OK fit for the whole dataset, then three separate models for each house age category, which gave a better fit for each individual category, but was clunky because you had three separate models to work with and explain. Ideally, you'd have a single model that had all the predictive power of the individual models.
+
+Defining this single model is achieved through adding interactions between explanatory variables. R's formula syntax is flexible, and gives you a couple of options, depending on whether you prefer concise code that is quick to type and to read, or explicit code that describes what you are doing in detail.
+
+`taiwan_real_estate` is available.
+
+**Instructions 1/2**
+
+-   Fit a linear regression of `price_twd_msq` versus `n_convenience` and `house_age_years` and their interaction, using the "times" syntax to implicitly generate the interaction.
+
+```{r}
+# Model price vs both with an interaction using "times" syntax
+lm(price_twd_msq ~ n_convenience * house_age_years, data = taiwan_real_estate)
+```
+
+**2/2:** fit a linear regression of `price_twd_msq` versus `n_convenience` and `house_age_years` and their interaction, using the "colon" syntax to explicitly generate the interaction.
+
+```{r}
+# Model price vs both with an interaction using "colon" syntax
+lm(price_twd_msq ~ n_convenience + house_age_years + n_convenience:house_age_years, data = taiwan_real_estate)
+```
+
+## **Interactions with understandable coeffs**
+
+The previous model with the interaction term returned coefficients that were a little tricky to interpret. In order clarify what the model is predicting, you can reformulate the model in a way that returns understandable coefficients. For further clarity, you can compare the results to the models on the separate house age categories (`mdl_0_to_15`, `mdl_15_to_30`, and `mdl_30_to_45`).
+
+`taiwan_real_estate`, `mdl_0_to_15`, `mdl_15_to_30`, and `mdl_30_to_45` are available.
+
+**Instructions 1/2**
+
+-   Fit a linear regression of `price_twd_msq` versus `house_age_years` plus an interaction between `n_convenience` and `house_age_years`, and no global intercept, using the `taiwan_real_estate` dataset.
+
+-   For comparison, get the coefficients for the three models for each category: `mdl_0_to_15`, `mdl_15_to_30`, and `mdl_30_to_45`.
+
+```{r}
+taiwan_0_to_15 <- taiwan_real_estate %>% 
+  filter(house_age_years == "0 to 15")
+taiwan_15_to_30 <- taiwan_real_estate %>% 
+  filter(house_age_years == "15 to 30")
+taiwan_30_to_45 <- taiwan_real_estate %>% 
+  filter(house_age_years == "30 to 45")
+```
+
+```{r}
+mdl_0_to_15 <- lm(formula = price_twd_msq ~ n_convenience, data = taiwan_0_to_15)
+mdl_15_to_30 <- lm(formula = price_twd_msq ~ n_convenience, data = taiwan_15_to_30)
+mdl_30_to_45 <- lm(formula = price_twd_msq ~ n_convenience, data = taiwan_30_to_45)
+```
+
+```{r}
+# Model price vs. house age plus an interaction, no intercept
+mdl_readable_inter <- lm(price_twd_msq ~ house_age_years + n_convenience:house_age_years + 0, data = taiwan_real_estate)
+
+# See the result
+coefficients(mdl_readable_inter)
+
+# Get coefficients for mdl_0_to_15
+coefficients(mdl_0_to_15)
+
+# Get coefficients for mdl_15_to_30
+coefficients(mdl_15_to_30)
+
+# Get coefficients for mdl_30_to_45
+coefficients(mdl_30_to_45)
+```
+
+## Video 2.3: Making predictions with interactions
+
+Let's run through the prediction flow again, this time with the model containing an interaction. I'm hoping you get a sense of deja vu, because you've seen all this code before.
+
+### The model with the interaction
+
+Here's the model of mass versus length and species with an interaction. I've used the version of the formula that gives the clearest coefficients, but I could also have used the simpler length times species syntax; it doesn't affect the predictions.
+
+```{r}
+mdl_mass_vs_both_inter <- lm(mass_g ~ species + species:length_cm + 0, data = fish)
+mdl_mass_vs_both_inter
+```
+
+### The prediction flow, again
+
+Here's the code for the prediction flow. It's exactly the same as the code in the parallel slopes model. R will automatically take care of the interaction, so you don't need to change anything. I love it when things just work! The only thing to remember here is the use of `expand_grid` to get all the combinations of lengths and species.
+
+```{r}
+library(dplyr)
+library(tidyr)
+explanatory_data <- expand_grid(
+  length_cm = seq(5, 60, 5),
+  species = unique(fish$species)
+)
+
+prediction_data <- explanatory_data %>% 
+  mutate(mass_g = predict(mdl_mass_vs_both_inter, explanatory_data))
+```
+
+### Visualizing the predictions
+
+Here's the plot of predictions - both `ggplot`'s automatic prediction lines, and the points predicted from the model. The plot is identical to the one you saw in the first video of this chapter. This time however, the code is simpler because you don't have four separate models to worry about.
+
+```{r}
+ggplot(fish, aes(length_cm, mass_g, color = species)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(data = prediction_data, size = 3, shape = 15)
+```
+
+### Manually calculating the predictions
+
+To see how the predictions work, let's manually calculate them. First we get the coefficients from the model using the coefficients function. Then we use square bracket indexing to extract the four intercepts and the four slopes.
+
+```{r}
+coeffs <- coefficients(mdl_mass_vs_both_inter)
+
+intercept_bream <- coeffs[1]
+intercept_perch <- coeffs[2]
+intercept_pike <- coeffs[3]
+intercept_roach <- coeffs[4]
+slope_bream <- coeffs[5]
+slope_perch <- coeffs[6]
+slope_pike <- coeffs[7]
+slope_roach <- coeffs[8]
+
+```
+
+```{r}
+explanatory_data %>%  
+  mutate(    
+    mass_g = case_when(      
+      species == "Bream" ~ intercept_bream + slope_bream * length_cm,      
+      species == "Perch" ~ intercept_perch + slope_perch * length_cm,      
+      species == "Pike" ~ intercept_pike + slope_pike * length_cm,      
+      species == "Roach" ~ intercept_roach + slope_roach * length_cm
+      )
+    )
+
+```
+
+## **Predicting with interactions**
+
+As with every other regression model you've created, the fun part is making predictions. Fortunately, the code flow for this case is the same as the one without interactions—R can handle calculating the interactions without any extra prompting from you. The only thing you need to remember is the trick for getting combinations of explanatory variables.
+
+`mdl_price_vs_both_inter` is available; `dplyr` and `ggplot2` are loaded.
+
+**Instructions 1/3**
+
+Make a grid of explanatory data, formed from combinations of the following variables.
+
+-   `n_convenience` should take the numbers zero to ten.
+
+-   `house_age_years` should take the unique values of the `house_age_years` column of `taiwan_real_estate`.
+
+```{r}
+mdl_price_vs_both_inter <- lm(formula = price_twd_msq ~ house_age_years + n_convenience:house_age_years + 0, data = taiwan_real_estate)
+```
+
+```{r}
+# Make a grid of explanatory data
+explanatory_data <- expand_grid(
+  # Set n_convenience to zero to ten
+  n_convenience = 0:10,
+  # Set house_age_years to the unique values of that variable
+  house_age_years = unique(taiwan_real_estate$house_age_years)
+)
+
+# See the result
+explanatory_data
+```
+
+**2/3**
+
+-   Add a column to the `explanatory_data`, assigning to `prediction_data`.
+
+-   The column should be named after the response variable, and contain predictions made using `mdl_price_vs_both_inter` and `explanatory_data`.
+
+```{r}
+# From previous step
+explanatory_data <- expand_grid(
+  n_convenience = 0:10,
+  house_age_years = unique(taiwan_real_estate$house_age_years)
+)
+
+# Add predictions to the data frame
+prediction_data <- explanatory_data %>%
+  mutate(price_twd_msq = predict(mdl_price_vs_both_inter, explanatory_data))
+
+# See the result
+prediction_data
+```
+
+**3/3**
+
+-   Using `taiwan_real_estate`, plot `price_twd_msq` versus `n_convenience`, colored by `house_age_years`.
+
+-   Add a point layer.
+
+-   Add smooth trend lines using linear regression, no standard error ribbon.
+
+-   Add another point layer using `prediction_data`, with `size` `5` and `shape` `15`.
+
+```{r}
+# Using taiwan_real_estate, plot price vs. no. of convenience stores, colored by house age
+ggplot(taiwan_real_estate, aes(n_convenience, price_twd_msq, color = house_age_years)) +
+  # Make it a scatter plot
+  geom_point() +
+  # Add linear regression trend lines, no ribbon
+  geom_smooth(method = "lm", se = FALSE) +
+  # Add points from prediction_data, size 5, shape 15
+  geom_point(data = prediction_data, size = 5, shape = 15)
+```
+
+## **Manually calculating predictions with interactions**
+
+In order to understand how `predict()` works, it's time to calculate the predictions manually again. For this model, there are three separate lines to calculate for, and in each one, the prediction is an intercept plus a slope times the numeric explanatory value. The tricky part is getting the right intercept and the right slope for each case.
+
+`mdl_price_vs_both_inter` and `explanatory_data` are available; `dplyr` and `tidyr` are available.
+
+**Instructions 1/2**
+
+-   Get the coefficients from `mdl_price_vs_both_inter`, assigning to `coeffs`.
+
+-   Get the three intercept coefficients from `coeffs`, assigning to `intercept_0_15`, `intercept_15_30`, and `intercept_30_45`.
+
+-   Get the three slope coefficients from `coeffs`, assigning to `slope_0_15`, `slope_15_30`, and `slope_30_45`.
+
+```{r}
+mdl_price_vs_both_inter <- lm(formula = price_twd_msq ~ house_age_years + n_convenience:house_age_years + 0, data = taiwan_real_estate)
+
+# Get the coefficients from mdl_price_vs_both_inter
+coeffs <- coefficients(mdl_price_vs_both_inter)
+
+# Get the intercept for 0 to 15 year age group
+intercept_0_15 <- coeffs[1]
+
+# Get the intercept for 15 to 30 year age group
+intercept_15_30 <- coeffs[2]
+
+# Get the intercept for 30 to 45 year age group
+intercept_30_45 <- coeffs[3]
+
+# Get the slope for 0 to 15 year age group
+slope_0_15 <- coeffs[4]
+
+# Get the slope for 15 to 30 year age group
+slope_15_30 <- coeffs[5]
+
+# Get the slope for 30 to 45 year age group
+slope_30_45 <- coeffs[6]
+```
+
+**2/2** Add a `price_twd_msq` column to `explanatory_data` containing the predictions.
+
+-   In the case when `house_age_years` is `"0 to 15"`, choose the appropriate intercept plus the appropriate slope times the number of nearby convenience stores.
+
+-   Do likewise for the cases where the house age is `"15 to 30"` and `"30 to 45"`.
+
+```{r}
+# From previous step
+coeffs <- coefficients(mdl_price_vs_both_inter)
+intercept_0_15 <- coeffs[1]
+intercept_15_30 <- coeffs[2]
+intercept_30_45 <- coeffs[3]
+slope_0_15 <- coeffs[4]
+slope_15_30 <- coeffs[5]
+slope_30_45 <- coeffs[6]
+
+prediction_data <- explanatory_data %>% 
+  mutate(
+    # Consider the 3 cases to choose the price
+    price_twd_msq = case_when(
+      house_age_years == "0 to 15" ~ intercept_0_15 + slope_0_15 * n_convenience,
+      house_age_years == "15 to 30" ~ intercept_15_30 + slope_15_30 * n_convenience,
+      house_age_years == "30 to 45" ~ intercept_30_45 + slope_30_45 * n_convenience
+    )
+  )
+
+# See the result
+prediction_data
+```
+
+## Video 2.4: Simpson's Paradox
+
+This chapter looked at the difference between models of a whole dataset and individual models for each category. For some datasets, this can lead to a nonintuitive result known as Simpson's Paradox.
+
+### A most ingenious paradox!
+
+Simpson's Paradox occurs when the trend of a model on the whole dataset is very different from the trends shown by models on subsets of the dataset.
+
+*trend = slope coefficient*
+
+### Synthetic Simpson data
+
+Here's a synthetic - that is, made up - dataset designed to demonstrate the paradox. Each row has an x and y coordinate, and the dataset is split into five groups, labeled A to E.
+
+```{r}
+head(simpsons_paradox)
+```
+
+### Linear regressions
+
+Fitting a linear regression of y versus x to the whole dataset shows a positive slope of one point seven five. However, fitting a model that includes the group and an interaction shows something completely different. The bottom row of coefficients contains the slope for each group. Every group has a negative slope, apparently contradicting the fact that the whole dataset has a positive slope. Let's visualize the dataset to try and reconcile these opposite coefficients.
+
+**Whole dataset**
+
+```{r}
+mdl_whole <- lm(
+  y ~ x,
+  data = simpsons_paradox
+)
+coefficients(mdl_whole)
+```
+
+**By group**
+
+```{r}
+mdl_by_group <- lm(
+  y ~ group + group:x + 0,
+  data = simpsons_paradox
+)
+coefficients(mdl_by_group)
+```
+
+### Plotting the whole dataset
+
+This is the now-standard scatter plot with a linear regression trend line. As x increases, so does y, resulting in a positive slope over the whole dataset.
+
+```{r}
+ggplot(simpsons_paradox, aes(x, y)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+### Plotting by group
+
+Amending the plot to color the lines by group shows that within each group, y increases as x increases.
+
+```{r}
+ggplot(simpsons_paradox, aes(x, y, color = group)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+### Reconciling the difference
+
+-   **Good advice**: If possible, try to plot the dataset.
+
+-   **Common advice**: You can't choose the best model in general–it depends on the dataset and the question you are trying to answer.
+
+-   **More good advice**: Articulate a question before you start modeling.
+
+### Test score example
+
+Thinking up examples where the grouped model is best is fairly easy. Here's the same synthetic dataset as before, with different axis labels. If x is the number of hours spent playing video games each month, and y is the score on a test, modeling the whole dataset suggests that playing more video games is related to a higher test score. If we reveal that each group represents the age of the child taking the test, it changes the interpretation. Now older children score more highly in the test, and playing lots of video games is related to a lower score.
+
+### Infectious disease example
+
+Coming up with examples where the model of the whole dataset is more useful than the model split by group is much harder. So much so that I had to ask the internet for suggestions. One proposed example was that for an infectious disease, the infection rate tends to be higher when the population density is higher. In this plot, each point represents a neighborhood in a city. Splitting by city reveals that the highest density areas of each city have lower infection rates. However, this may be due to other things that you haven't included in the model, like the wealth and demographics of the residents. That's an interesting insight, but "increasing population density is related to increased infection rate" is arguably more important.
+
+### Reconciling the difference, again
+
+Unfortunately, resolving these model disagreements is messy. Often, the models including the groups will contain insight that you'd miss otherwise. The disagreements between the models may reveal that you need even more explanatory variables to understand why they are different. Finally, I'm going to repeat the correct but annoying advice: to choose the best model you need contextual information about what your dataset means and what question you are trying to answer.
+
+### Simpson's paradox in real datasets
+
+Such a clear case of Simpson's paradox is very rare. Subtle differences between models are more common. A slope may go to zero instead of changing its direction. You may only see the effect in some groups, but not all of them.
+
+## **Modeling eBay auctions**
+
+Sometimes modeling a whole dataset suggests trends that disagree with models on separate parts of that dataset. This is known as Simpson's paradox. In the most extreme case, you may see a positive slope on the whole dataset, and negative slopes on every subset of that dataset (or the other way around).
+
+Over the next few exercises, you'll look at [**eBay auctions**](http://www.modelingonlineauctions.com/datasets) of Palm Pilot M515 PDA models.
+
+| variable       | meaning                        |
+|:---------------|:-------------------------------|
+| `price`        | Final sale price, USD          |
+| `openbid`      | The opening bid, USD           |
+| `auction_type` | How long did the auction last? |
+
+`auctions` is available; `dplyr` and `ggplot2` are loaded.
+
+**Instructions 1/2**
+
+-   Look at the structure of the `auctions` dataset and familiarize yourself with its columns.
+
+-   Fit a linear regression model of `price` versus `openbid`, using the `auctions` dataset. *Look at the coefficients.*
+
+```{r}
+# Take a glimpse at the dataset
+glimpse(auctions)
+
+# Model price vs. opening bid using auctions
+mdl_price_vs_openbid <- lm(price ~ openbid, data = auctions)
+
+# See the result
+mdl_price_vs_openbid
+```
+
+**2/2**: Using auctions, plot `price` versus `openbid` as a scatter plot with linear regression trend lines (no ribbon). *Look at the trend line.*
+
+```{r}
+# Using auctions, plot price vs. opening bid as a scatter plot with linear regression trend lines
+ggplot(auctions, aes(openbid, price)) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE)
+```
+
+## **Modeling each auction type**
+
+You just saw that the opening bid price appeared not to affect the final sale price of Palm Pilots in the eBay auctions. Now let's look at what happens when you model the three auction types (3 day, 5 day, and 7 day) separately.
+
+`auctions` is available; `dplyr` and `ggplot2` are loaded.
+
+**Instructions 1/3**
+
+-   Fit a linear regression model of `price` versus `openbid` and `auction_type`, with an interaction, using the `auctions` dataset. *Look at the coefficients.*
+
+```{r}
+# Fit linear regression of price vs. opening bid and auction type, with an interaction.
+mdl_price_vs_both <- lm(price ~ openbid * auction_type, data = auctions)
+
+# See the result
+mdl_price_vs_both
+```
+
+**2/3**
+
+-   Using `auctions`, plot `price` versus `openbid`, colored by `auction_type`, as a scatter plot with linear regression trend lines (no ribbon). *Look at the trend lines.*
+
+```{r}
+# Using auctions, plot price vs. opening bid colored by auction type as a scatter plot with linear regr'n trend lines
+ggplot(auctions, aes(openbid, price, color = auction_type)) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE)
+```
