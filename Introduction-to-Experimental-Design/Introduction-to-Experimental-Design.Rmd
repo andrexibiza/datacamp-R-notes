@@ -1,0 +1,138 @@
+---
+title: "Introduction to Experimental Design"
+output: html_notebook
+---
+
+# Chapter 1: Introduction to Experimental Design
+
+## Video 1.1: Introduction to Experimental Design
+
+### Intro to experimental design
+
+-   Starts with a question (hypothesis)
+-   Collecting & analyzing the data
+
+### Steps of an experiment
+
+-   Planning
+    -   dependent variable = outcome
+    -   independent variable(s) = explanatory variables
+-   Design
+-   Analysis
+
+### Key components of an experiment
+
+-   Randomization
+-   Replication
+-   Blocking
+
+### Randomization
+
+-   Evenly distributes any variability in outcome due to outside factors across treatment groups
+-   Example:
+    -   double-blind medical trials
+    -   neither the patient nor the doctor knows who is getting the treatment
+    -   group assignment made randomly by 3rd party.
+
+### Recap: t-tests
+
+-   t-tests help answer research questions.
+
+```         
+data("mtcars")
+```
+
+```         
+t.test(x = mtcars$mpg, alternative = "two.sided", mu = 40)
+```
+
+```         
+library(broom)
+```
+
+```         
+tidy()
+```
+
+## Video 1.2: Replication and blocking
+
+### Replication
+
+-   Must repeat an experiment to fully assess variability If we only conduct a drug efficacy experiment on one person, how can we properly generalize those results? (We can't!)
+
+```{r}
+library(dplyr)
+mtcars %>% 
+  count(cyl)
+```
+
+### Blocking
+
+-   Helps control variability by making treatment groups more alike
+-   Inside of groups, differences will be minimal. Across groups, differences will be larger
+-   One example is blocking treatment groups by sex
+
+### Boxplots
+
+```{r}
+library(ggplot2)
+ggplot(mtcars, aes(x=as.factor(cyl), y=mpg)) +
+  geom_boxplot(fill="slateblue",
+               alpha = 0.2) +
+  xlab("cyl")
+```
+
+### Functions for modeling
+
+-   Linear models
+
+```         
+lm(formula, data, na.action,...)
+```
+
+-   One-way ANOVA model
+
+```         
+aov(formula, data = NULL,...)
+```
+
+-   Nested ANOVA model
+
+```         
+anova(object,...)
+```
+
+### Breaking down hypothesis testing
+
+-   **Null hypothesis**:
+
+    -   there is no change
+
+    -   no difference between groups
+
+    -   the mean, media, or observation = a number
+
+-   **Alternative hypothesis**:
+
+    -   there is a change
+
+    -   difference between groups
+
+    -   mean, median, observation is `>`, `<` or `!=` a number
+
+### Power and sample size
+
+-   **Power**: probability that the test correctly rejects the null hypothesis when the alternative hypothesis is true.
+
+-   **Effect size**: standardized measure of the difference you're trying to detect.
+
+-   **Sample size**: how many experimental units you need to survey to detect the desired difference at the desired power.
+
+```{r}
+library(pwr)
+pwr.anova.test(k = 3,
+               n = 20,
+               f = 0.2,
+               sig.level = 0.05,
+               power = NULL)
+```
